@@ -53,18 +53,8 @@ which the following packages provide:
   partially determines the [score]({{site.pub}}/help/scoring) of
   packages uploaded to [pub.dev]({{site.pub}}).
 
-<a id="pedantic"></a>
-[pedantic][] (_deprecated_)
-: The deprecated set of rules previously used to match
-  the rules used for all Google-internal Dart code.
-  Consider migrating to one of the rule sets in
-  the [`lints`](#lints) or [`flutter_lints`](#flutter_lints) packages.
-  See [Migrating from pedantic][] for more information on switching.
-   
-[Migrating from pedantic]: https://github.com/dart-lang/lints#migrating-from-packagepedantic
 [lints]: {{site.pub-pkg}}/lints
 [flutter_lints]: {{site.pub-pkg}}/flutter_lints
-[pedantic]: {{site.pub-pkg}}/pedantic
 
 To learn how to use a specific rule set,
 see the documentation for [enabling and disabling linter rules][].
@@ -101,6 +91,20 @@ Experimental
 Deprecated
 : These rules are no longer suggested for use
   and might be removed in a future linter release.
+
+## Quick fixes
+
+Some rules can be fixed automatically using quick fixes.
+A quick fix is an automated edit 
+targeted at fixing the issue
+reported by the linter rule.
+
+If the rule has a quick fix,
+it can be applied using [`dart fix`](/tools/dart-fix)
+or using your [editor with Dart support](/tools#ides-and-editors).
+To learn more, see [Quick fixes for analysis issues][].
+
+[Quick fixes for analysis issues]: https://medium.com/dartlang/quick-fixes-for-analysis-issues-c10df084971a
 
 ## Error rules
 

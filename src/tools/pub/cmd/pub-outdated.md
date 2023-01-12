@@ -1,7 +1,6 @@
 ---
 title: dart pub outdated
 description: Use dart pub outdated to help you update your package dependencies.
-diff2html: true
 ---
 
 _Outdated_ is one of the commands of the [pub tool](/tools/pub/cmd).
@@ -24,8 +23,8 @@ update the dependencies of a package that you own
 
 1. If your package doesn't have a `pubspec.lock` file
    checked into source control,
-   **run `dart pub get`** in the top directory of the package —
-   the directory that contains your package's
+   **run `dart pub get`** in the top directory of the package—the
+   directory that contains your package's
    [`pubspec.yaml`](/tools/pub/pubspec) file.
 2. **Run `dart pub outdated`**
    to identify which package dependencies are out-of-date.
@@ -95,10 +94,6 @@ the version in the **Resolvable** column
 (or a compatible higher version).
 In [caret syntax][], that's **`^0.12.1`**.
 Here's the diff for `pubspec.yaml`:
-
-{% comment %}
-  [TODO: Improve the formatting of the following diff]
-{% endcomment %}
 
 ```diff
 -  http: ^0.11.0
@@ -203,14 +198,6 @@ so that each package uses the versions in the **Resolvable** column.
 
 For options that apply to all pub commands, see
 [Global options](/tools/pub/cmd#global-options).
-
-### `--[no-]color`
-
-Adds color to the output for emphasis (`--color`). 
-The default depends on whether you're using this command at a terminal.
-At a terminal, `--color` is the default, 
-otherwise, `--no-color` is the default. 
-Use `--no-color` to disable color in all environments.
 
 ### `--[no-]dependency-overrides`
 

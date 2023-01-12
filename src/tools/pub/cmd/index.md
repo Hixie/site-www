@@ -19,10 +19,10 @@ but if your current directory holds a Flutter app
 or other Flutter-specific code,
 use `flutter pub <subcommand>` instead.
 For more information, see
-[Using packages]({{site.flutter_docs}}/development/packages-and-plugins/using-packages)
+[Using packages]({{site.flutter-docs}}/development/packages-and-plugins/using-packages)
 on the [Flutter website]({{site.flutter}}).
 
-[flutter-cli]: {{site.flutter_docs}}/reference/flutter-cli
+[flutter-cli]: {{site.flutter-docs}}/reference/flutter-cli
 [dart-cli]: /tools/dart-tool
 
 {{site.alert.version-note}}
@@ -30,7 +30,7 @@ on the [Flutter website]({{site.flutter}}).
   Although you might still find examples of
   using the standalone `pub` command instead of
   `dart pub` or `flutter pub`,
-  the standalone `pub` command is deprecated.
+  the standalone `pub` command has been removed.
 {{site.alert.end}}
 
 If you encounter problems using the pub tool,
@@ -114,13 +114,6 @@ To run globally available scripts, you must
 
 With pub you can publish packages and command-line apps.
 
-{{site.alert.note}}
-  Pub used to support building apps
-  through commands like `pub build` and `pub serve`.
-  That functionality is now in other tools such as the build system.
-  For details, see [Obsolete Pub Features](/tools/pub/obsolete).
-{{site.alert.end}}
-
 #### Packages
 
 To share your Dart packages with the world, you can
@@ -153,22 +146,6 @@ Prints usage information.
 
 Prints debugging information when an error occurs.
 
-### `--verbosity=`_`<level>`_
-
-The specified level determines the amount of information that is displayed:
-
-* `all`
-: Shows all output, including internal tracing messages.
-
-* `io`
-: Shows I/O operations.
-
-* `normal`
-: Shows errors, warnings, and user messages.
-
-* `solver`
-: Shows steps during version resolution.
-
 ### `--verbose` or `-v`
 
 Equivalent to `--verbosity=all`.
@@ -176,4 +153,12 @@ Equivalent to `--verbosity=all`.
 ### `--directory=<dir>` or `-C <dir>`
 
 Runs the command in the specified directory.
+
+### `--[no-]color`
+
+Adds color to the output for emphasis (`--color`).
+The default depends on whether you're using this command at a terminal.
+At a terminal, `--color` is the default,
+otherwise, `--no-color` is the default.
+Use `--no-color` to disable color in all environments.
 

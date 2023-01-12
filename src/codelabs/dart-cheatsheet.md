@@ -8,10 +8,10 @@ js: [{url: 'https://dartpad.dev/inject_embed.dart.js', defer: true}]
 The Dart language is designed to be easy to learn for
 coders coming from other languages,
 but it has a few unique features.
-This codelab — which is based on a
+This codelab—which is based on a
 [Dart language cheatsheet](/guides/language/cheatsheet)
-written by and for Google engineers —
-walks you through the most important of these language features.
+written by and for Google engineers—walks you through
+the most important of these language features.
 
 The embedded editors in this codelab have partially completed code snippets.
 You can use these editors to test your knowledge by completing the code and
@@ -40,6 +40,7 @@ Here are some examples of using string interpolation:
 | `'$myObject'`               | | The value of `myObject.toString()` |
 
 ### Code example
+{: .no_toc}
 
 The following function takes two integers as parameters.
 Make it return a string containing both integers separated by a space.
@@ -123,6 +124,7 @@ read the [sound null safety guide](/null-safety).
 
 
 ### Code example
+{: .no_toc}
 
 Try to declare two variables below:
 - A nullable `String` named `name` with the value `'Jane'`.
@@ -190,6 +192,7 @@ print(null ?? 12); // <-- Prints 12.
 ```
 
 ### Code example
+{: .no_toc}
 
 Try substituting in the `??=` and `??` operators
 to implement the described behavior in the following snippet.
@@ -285,6 +288,7 @@ null.
 
 
 ### Code example
+{: .no_toc}
 
 Try using conditional property access to finish the code snippet below.
 
@@ -381,6 +385,7 @@ final aListOfBaseType = <BaseType>[SubType(), SubType()];
 ```
 
 ### Code example
+{: .no_toc}
 
 Try setting the following variables to the indicated values. Replace the existing null values.
 
@@ -506,6 +511,7 @@ bool hasEmpty = aListOfStrings.any((s) => s.isEmpty);
 ```
 
 ### Code example
+{: .no_toc}
 
 Try finishing the following statements, which use arrow syntax.
 
@@ -627,7 +633,7 @@ myObject..someMethod()
 ```
 
 Although it still invokes `someMethod()` on `myObject`, the result
-of the expression **isn't** the return value — it's a reference to `myObject`!
+of the expression **isn't** the return value—it's a reference to `myObject`!
 
 Using cascades, you can chain together operations that
 would otherwise require separate statements.
@@ -641,6 +647,7 @@ var button = querySelector('#confirm');
 button?.text = 'Confirm';
 button?.classes.add('important');
 button?.onClick.listen((e) => window.alert('Confirmed!'));
+button?.scrollIntoView();
 ```
 
 To instead use cascades, 
@@ -655,10 +662,12 @@ and makes the `button` variable unnecessary:
 querySelector('#confirm')
   ?..text = 'Confirm'
   ..classes.add('important')
-  ..onClick.listen((e) => window.alert('Confirmed!'));
+  ..onClick.listen((e) => window.alert('Confirmed!'))
+  ..scrollIntoView();
 ```
 
 ### Code example
+{: .no_toc}
 
 Use cascades to create a single statement that
 sets the `anInt`, `aString`, and `aList` properties of a `BigObject`
@@ -803,6 +812,7 @@ class MyClass {
 ```
 
 ### Code example
+{: .no_toc}
 
 Imagine you have a shopping cart class that keeps a private `List<double>`
 of prices.
@@ -913,8 +923,8 @@ with a function you give it
 
 ## Optional positional parameters
 
-Dart has two kinds of function parameters: positional and named. Positional parameters are the kind
-you're likely familiar with:
+Dart has two kinds of function parameters: positional and named. 
+Positional parameters are the kind you're likely familiar with:
 
 <?code-excerpt "misc/lib/cheatsheet/optional_positional_args.dart (optional-positional-args)"?>
 ```dart
@@ -957,6 +967,7 @@ int sumUpToFive(int a, [int b = 2, int c = 3, int d = 4, int e = 5]) {
 ```
 
 ### Code example
+{: .no_toc}
 
 Implement a function called `joinWithCommas()` that accepts one to
 five integers, then returns a string of those numbers separated by commas.
@@ -1046,25 +1057,30 @@ before you add them to the final string.
 {$ end hint.txt $}
 ```
 
+<a id="optional-named-parameters"></a>
+## Named parameters
 
-## Optional named parameters
+Using a curly brace syntax at the end of the parameter list,
+you can define parameters that have names.
 
-Using a curly brace syntax,
-you can define optional parameters that have names.
+Named parameters are optional
+unless they're explicitly marked as `required`.
 
-<?code-excerpt "misc/lib/cheatsheet/optional_named_params.dart"?>
+<?code-excerpt "misc/lib/cheatsheet/named_parameters.dart"?>
 ```dart
-void printName(String firstName, String lastName, {String? suffix}) {
-  print('$firstName $lastName ${suffix ?? ''}');
+void printName(String firstName, String lastName, {String? middleName}) {
+  print('$firstName ${middleName ?? ''} $lastName');
 }
 // ···
-  printName('Avinash', 'Gupta');
-  printName('Poshmeister', 'Moneybuckets', suffix: 'IV');
+  printName('Dash', 'Dartisan');
+  printName('John', 'Smith', middleName: 'Who');
+  // Named arguments can be placed anywhere in the argument list
+  printName('John', middleName: 'Who', 'Smith');
 ```
 
 As you might expect,
-the default value of an optional named parameter is `null`,
-but you can provide a default value.
+the default value of a nullable named parameter is `null`,
+but you can provide a custom default value.
 
 If the type of a parameter is non-nullable,
 then you must either provide a default value
@@ -1073,17 +1089,18 @@ or mark the parameter as `required`
 (as shown in the
 [constructor section](#using-this-in-a-constructor)).
 
-<?code-excerpt "misc/test/cheatsheet/arguments_test.dart (defaulted-suffix)" replace="/ = ''/[! = ''!]/g;"?>
+<?code-excerpt "misc/test/cheatsheet/arguments_test.dart (defaulted-middle)" replace="/ = ''/[! = ''!]/g;"?>
 ```dart
-void printName(String firstName, String lastName, {String suffix[! = ''!]}) {
-  print('$firstName $lastName $suffix');
+void printName(String firstName, String lastName, {String middleName[! = ''!]}) {
+  print('$firstName $middleName $lastName');
 }
 ```
 
-A function can't have both optional positional and optional named parameters.
+A function can't have both optional positional and named parameters.
 
 
 ### Code example
+{: .no_toc}
 
 Add a `copyWith()` instance method to the `MyDataObject`
 class. It should take three named, nullable parameters:
@@ -1264,6 +1281,7 @@ try {
 ```
 
 ### Code example
+{: .no_toc}
 
 Implement `tryFunction()` below. It should execute an untrustworthy method and
 then do the following:
@@ -1474,6 +1492,7 @@ MyColor({this.red = 0, this.green = 0, this.blue = 0});
 ```
 
 ### Code example
+{: .no_toc}
 
 Add a one-line constructor to `MyClass` that uses
 `this.` syntax to receive and assign values for
@@ -1576,6 +1595,7 @@ NonNegativePoint(this.x, this.y)
 ```
 
 ### Code example
+{: .no_toc}
 
 Complete the `FirstTwoLetters` constructor below.
 Use an initializer list to assign the first two characters in `word` to
@@ -1696,6 +1716,7 @@ final myPoint = Point.origin();
 ```
 
 ### Code example
+{: .no_toc}
 
 Give the `Color` class a constructor named `Color.black`
 that sets all three properties to zero.
@@ -1790,6 +1811,7 @@ class Shape {
 ```
 
 ### Code example
+{: .no_toc}
 
 Fill in the factory constructor named `IntegerHolder.fromList`,
 making it do the following:
@@ -1985,6 +2007,7 @@ class Automobile {
 ```
 
 ### Code example
+{: .no_toc}
 
 Remember the `Color` class from above? Create a named constructor called
 `black`, but rather than manually assigning the properties, redirect it to the
@@ -2071,6 +2094,7 @@ class ImmutablePoint {
 ```
 
 ### Code example
+{: .no_toc}
 
 Modify the `Recipe` class so its instances can be constants,
 and create a constant constructor that does the following:
@@ -2135,7 +2159,7 @@ To make the constructor const, you'll need to make all the properties final.
 {$ end hint.txt $}
 ```
 
-## What next?
+## What's next?
 
 We hope you enjoyed using this codelab to learn or test your knowledge of
 some of the most interesting features of the Dart language.

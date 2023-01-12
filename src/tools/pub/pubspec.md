@@ -76,16 +76,25 @@ A pubspec can have the following fields:
 : Optional. Specify where to publish a package.
   [_Learn more._](#publish_to)
 
+`funding`
+: Optional. List of URLs where users can sponsor development of the package.
+  [_Learn more._](#funding)
+
 `false_secrets`
 : Optional. Specify files to ignore when conducting a pre-publishing search
   for potential leaks of secrets.
   [_Learn more._](#false_secrets)
+  
+`screenshots`
+: Optional. Specify a list of screenshot files to display 
+  on the [pub.dev site]({{site.pub}}).
+  [_Learn more._](#screenshots)
 
 Pub ignores all other fields,
 
-{{site.alert.info}}
-  **Flutter note:** Pubspecs for [Flutter apps]({{site.flutter}}) can have
-  [additional fields]({{site.flutter_docs}}/development/tools/pubspec)
+{{site.alert.flutter-note}}
+  Pubspecs for [Flutter apps]({{site.flutter}}) can have
+  [additional fields]({{site.flutter-docs}}/development/tools/pubspec)
   for configuring the environment and managing assets.
 {{site.alert.end}}
 
@@ -172,31 +181,12 @@ When you select a version, follow [semantic versioning.][semantic versioning]
 
 This is optional for your own personal packages, but if you intend to
 publish your package you must provide a description, which should be in English.
-The description should be relatively short&mdash;60 to 180 characters&mdash;and
+The description should be relatively short—60 to 180 characters—and
 tell a casual reader what they might want to know about your package.
 
 Think of the description as the sales pitch for your package. Users see it
 when they [browse for packages.]({{site.pub-pkg}})
 The description is plain text: no markdown or HTML.
-
-### Author/authors
-
-_Deprecated._ Use a [verified publisher][] instead.
-
-[verified publisher]: /tools/pub/verified-publishers
-
-You might see an `author` or `authors` section in old pubspecs.
-These optional fields were a way to describe
-the author(s) of your package and to provide contact information.
-Each author could be either a single name
-(`Natalie Weizenbaum`) or a name and an email address
-(`Natalie Weizenbaum <nweiz@google.com>`).
-However, these values weren't verified.
-
-The pub.dev site no longer displays package authors, and
-(as of Dart 2.7) the `pub publish` command
-displays a warning if your pubspec has an `author` or `authors` section.
-
 
 ### Homepage
 
@@ -209,7 +199,7 @@ While providing a `homepage` is optional, *please provide* it or `repository`
 ### Repository
 
 The optional `repository` field should contain the URL for your package's source
-code repository — for example, `https://github.com/<user>/<repository>`.
+code repository—for example, `https://github.com/<user>/<repository>`.
 If you publish your package to the pub.dev site, then your package's page
 displays the repository URL.
 While providing a `repository` is optional, *please provide* it or `homepage`
@@ -237,7 +227,7 @@ with that URL; pub shows a link to this documentation on your package's page.
 In this section you list each package that your package needs in order to work.
 
 Dependencies fall into one of two types. _Regular dependencies_ are listed
-under `dependencies:`&mdash;these are packages that anyone using your package
+under `dependencies:`—these are packages that anyone using your package
 will also need. Dependencies that are only needed in the development phase of
 the package itself are listed under `dev_dependencies`.
 
@@ -307,8 +297,7 @@ platforms:
   macos:
 ```
 
-{{site.alert.info}}
-  **Flutter note:**
+{{site.alert.flutter-note}}
   Flutter plugins use [plugin declarations][]
   instead of this field.
 {{site.alert.end}}
@@ -318,7 +307,7 @@ platforms:
 {{site.alert.end}}
 
 [publish a package]: /tools/pub/publishing
-[plugin declarations]: {{site.flutter_docs}}/development/packages-and-plugins/developing-packages#plugin-platforms
+[plugin declarations]: {{site.flutter-docs}}/development/packages-and-plugins/developing-packages#plugin-platforms
 
 
 ### Publish_to
@@ -331,6 +320,23 @@ to publish.
 {% prettify yaml tag=pre+code %}
 publish_to: none
 {% endprettify %}
+
+
+### Funding
+
+Package authors can use the `funding` property to specify a list of URLs that
+provide information on how users can help fund the development of the package.
+For example:
+
+```yaml
+funding:
+ - https://www.buymeacoffee.com/example_user
+ - https://www.patreon.com/some-account
+```
+
+If published to [pub.dev]({{site.pub}}) the links are displayed on the
+package page. This aims to help users fund the development
+of their dependencies.
 
 
 ### False_secrets
@@ -375,9 +381,42 @@ the pattern is considered relative to the package's root directory.
 {{site.alert.end}}
 
 {{site.alert.version-note}}
-  Support for the `false_secrets` field was added in Dart 2.15.
+  Dart 2.15 added support for the `false_secrets` field.
 {{site.alert.end}}
 
+### Screenshots
+
+Packages can showcase their widgets or other visual elements using screenshots
+displayed on their page.
+
+A package can list up to 10 screenshots under the `screenshots` field.
+Each screenshot includes one `description` and one `path`. 
+The `description` explains what the screenshot depicts in no more than 160 
+characters. 
+For example:
+
+```yaml
+screenshots:
+  - description: 'This screenshot shows the transformation of a number of bytes 
+  to a human-readable expression.'
+    path: path/to/image/in/package/500x500.webp
+  - description: 'This screenshot shows a stack trace returning a human-readable
+  representation.'
+    path: path/to/image/in/package.png
+```
+
+Pub.dev limits screenshots to the following specifications:
+
+- File size: max 4 MB per image.
+- File types: `png`, `jpg`, `gif`, or `webp`. 
+- Static and animated images are both allowed.
+
+Keep screenshot files small.
+Each download of the package includes all screenshot files.
+
+Pub.dev generates the package's thumbnail image from the first screenshot. If 
+this screenshot uses animation, pub.dev uses its first frame.
+ 
 ### SDK constraints
 
 A package can indicate which versions of its dependencies it supports, but
@@ -434,8 +473,8 @@ environment:
 
 #### Flutter SDK constraints
 
-As of Dart 1.19.0,
-pub supports Flutter SDK constraints under the `environment:` field:
+Pub supports specifying Flutter SDK constraints
+under the `environment:` field:
 
 ```yaml
 environment:

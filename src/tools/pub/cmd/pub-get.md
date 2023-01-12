@@ -57,13 +57,10 @@ get the latest versions of all dependencies.
 
 By default, pub creates a `package_config.json` file
 in the `.dart_tool/` directory that maps from package names to location URIs.
-Before the `package_config.json` file, 
-pub used to create a `.packages` file in the root directory.
 
 {{site.alert.note}}
-  Don't check the generated `.packages` file
-  or the `.dart_tool/` directory into your repo;
-  add them to your repo's `.gitignore` file.
+  Don't check the generated `.dart_tool/` directory into your repo;
+  add it to your repo's `.gitignore` file.
   For more information, 
   see [What not to commit](/guides/libraries/private-files).
 {{site.alert.end}}
@@ -147,6 +144,14 @@ want to analyze updates before making them.
 By default, pub precompiles executables
 in immediate dependencies (`--precompile`).
 To prevent precompilation, use `--no-precompile`.
+
+### `--legacy-packages-file`
+
+If you're using Dart 2.18 and use any third-party tools
+that rely on the discontinued `.packages` file,
+use `--legacy-packages-file` to generate a `.packages` file.
+Support for this flag will be removed in Dart 2.19.
+
 
 {{site.alert.info}}
   *Problems?*

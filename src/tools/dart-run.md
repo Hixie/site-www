@@ -3,9 +3,9 @@ title: dart run
 description: Command-line tool for running a Dart program.
 ---
 
-The `dart run` command supports running a Dart program —
-located in a file, in the current package, or in one of
-the dependencies of the current package — from the command line.
+The `dart run` command supports running 
+a Dart program—located in a file, in the current package, 
+or in one of the dependencies of the current package—from the command line.
 This command provides functionality that was previously in `pub run`
 and the Dart VM tool.
 To run a program from an arbitrary location,
@@ -128,16 +128,32 @@ $ dart run foo arg1 arg2
 
 ## Debugging
 
-To enable debugging, pass one or more debugging options.
-Here's an example of enabling [`assert` statements][assert]:
+To enable debugging, 
+add one or more of these common debugging options
+to your `dart run` command:
 
-```terminal
-$ dart run --enable-asserts tool/debug.dart
-```
+- To enable [`assert` statements][assert],
+  add the `--enable-asserts` flag:
 
-See `dart run --help` for details.
+  ```terminal
+  $ dart run --enable-asserts tool/debug.dart
+  ```
+
+- To enable debugging and performance analysis
+  through [Dart DevTools](/tools/dart-devtools),
+  add the `--observe` flag:
+
+  ```terminal
+  $ dart run --observe tool/debug.dart
+  ```
+  
+  To learn more about debugging with Dart DevTools,
+  see [Using DevTools with a command-line app][].
+
+To learn more about other debugging options, run `dart run --help`.
 
 [assert]: /guides/language/language-tour#assert
+[Using DevTools with a command-line app]: /tools/dart-devtools#using-devtools-with-a-command-line-app
 
 ## Enabling experimental features
 

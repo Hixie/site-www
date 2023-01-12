@@ -1,6 +1,7 @@
 // ignore_for_file: type_annotate_public_apis, unused_element, unused_local_variable
 // ignore_for_file: prefer_function_declarations_over_variables, strict_raw_type,
 // ignore_for_file: prefer_initializing_formals, prefer_typing_uninitialized_variables
+// ignore_for_file: use_super_parameters, dead_code
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
@@ -12,6 +13,7 @@ Func0<Future<void>> longRunningCalculation = () => Future.value();
 Func0 somethingRisky = () {};
 Func1 raiseAlarm = (_) {}, handle = (_) {};
 Func1<bool, dynamic> canHandle = (_) => false, verifyResult = (_) => false;
+T? somethingNullable<T>() => null;
 
 class Thing {
   bool get isEnabled => true;
@@ -19,18 +21,23 @@ class Thing {
 
 void miscDeclAnalyzedButNotTested() {
   {
-    Thing? optionalThing;
-    // #docregion convert-null-aware
-    // If you want null to be false:
-    if (optionalThing?.isEnabled ?? false) {
-      print('Have enabled thing.');
-    }
+    bool nonNullableBool = true;
+    bool? nullableBool = somethingNullable<bool>();
 
-    // If you want null to be true:
-    if (optionalThing?.isEnabled ?? true) {
-      print('Have enabled thing or nothing.');
-    }
-    // #enddocregion convert-null-aware
+    // #docregion non-null-boolean-expression
+    if (nonNullableBool) {/* ... */}
+
+    if (!nonNullableBool) {/* ... */}
+    // #enddocregion non-null-boolean-expression
+
+    // #docregion nullable-boolean-expression
+    // If you want null to result in false:
+    if (nullableBool ?? false) {/* ... */}
+
+    // If you want null to result in false
+    // and you want the variable to type promote:
+    if (nullableBool != null && nullableBool) {/* ... */}
+    // #enddocregion nullable-boolean-expression
   }
 
   {
@@ -231,7 +238,7 @@ void miscDeclAnalyzedButNotTested() {
       throw 'Error!';
     }
 
-    Future<void> asyncValue() async => 'value';
+    Future<String> asyncValue() async => 'value';
     // #enddocregion async
   }
 
@@ -557,21 +564,3 @@ Widget build(BuildContext context) {
   );
 }
 // #enddocregion no-new
-
-//----------------------------------------------------------------------------
-
-class Style {}
-
-class ViewBase {
-  ViewBase(_);
-}
-
-class View extends ViewBase {
-  final List _children;
-  // #docregion super-first
-  View(Style style, List children)
-      : _children = children,
-        super(style);
-  // #enddocregion super-first
-  List get children => _children;
-}

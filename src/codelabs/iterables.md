@@ -7,8 +7,8 @@ js: [{url: 'https://dartpad.dev/inject_embed.dart.js', defer: true}]
 <?code-excerpt plaster="none"?>
 
 This codelab teaches you how to use collections that
-implement the [Iterable][iterable class] class —
-for example [List][list class] and [Set.][set class]
+implement the [Iterable][iterable class] class—for example
+[List][list class] and [Set.][set class]
 Iterables are basic building blocks for
 all sorts of Dart applications,
 and you're probably already using them,
@@ -843,9 +843,10 @@ Iterable<int> output = numbers.map((number) => number * 10);
 
 In this example, each element of the `Iterable` numbers is multiplied by 10.
 
-You can also use `map()` to transform an element into a different object —
-for example, to convert all `int` to `String`,
-as you can see in the following example.
+You can also use `map()` 
+to transform an element into a different object—for example, 
+to convert all `int` to `String`,
+as you can see in the following example:
 
 <?code-excerpt "iterables/test/iterables_test.dart (map-string)"?>
 ```dart
@@ -1078,14 +1079,18 @@ const input = [
   'cal@gmail.com',
 ];
 
+const correctInput = ['dash@gmail.com', 'sparky@gmail.com'];
+
 bool isValidEmailAddress(EmailAddress email) {
   return email.address.contains('@');
 }
 
 void main() {
   Iterable<EmailAddress> emails;
+  Iterable<EmailAddress> correctEmails;
   try {
     emails = parseEmailAddresses(input);
+    correctEmails = parseEmailAddresses(correctInput);
     if (emails.isEmpty) {
       _result(false, [
         'Tried running `parseEmailAddresses`, but received an empty list.'
@@ -1116,7 +1121,14 @@ void main() {
     final out = anyInvalidEmailAddress(emails);
     if (!out) {
       _result(false, [
-        'Looks like `anyInvalidEmailAddress` is wrong. Keep trying! There is at least one invalid address.'
+        'Looks like `anyInvalidEmailAddress` is wrong. Keep trying! The result should be false with at least one invalid address.'
+      ]);
+      return;
+    }
+    final falseOut = anyInvalidEmailAddress(correctEmails);
+    if (falseOut) {
+      _result(false, [
+        'Looks like `anyInvalidEmailAddress` is wrong. Keep trying! The result should be false with all valid addresses.'
       ]);
       return;
     }
@@ -1187,11 +1199,11 @@ here are some suggestions for where to go next:
 * Read the [Iterable API reference][iterable class]
   to learn about methods not covered by this codelab.
 
-[hashmap class]: {{site.dart_api}}/stable/dart-collection/HashMap-class.html
-[iterable class]: {{site.dart_api}}/stable/dart-core/Iterable-class.html
-[iterator class]: {{site.dart_api}}/stable/dart-core/Iterator-class.html
-[list class]: {{site.dart_api}}/stable/dart-core/List-class.html
-[map class]: {{site.dart_api}}/stable/dart-core/Map-class.html
-[set class]: {{site.dart_api}}/stable/dart-core/Set-class.html
-[StateError class]: {{site.dart_api}}/stable/dart-core/StateError-class.html
-[String class]: {{site.dart_api}}/stable/dart-core/String-class.html
+[hashmap class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-collection/HashMap-class.html
+[iterable class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterable-class.html
+[iterator class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterator-class.html
+[list class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/List-class.html
+[map class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Map-class.html
+[set class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Set-class.html
+[StateError class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/StateError-class.html
+[String class]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/String-class.html

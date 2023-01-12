@@ -3,6 +3,11 @@ title: Dart 2 migration guide
 description: How Dart 2 is different from Dart 1.x, and how you can convert your code to work with Dart 2.
 ---
 
+<style>
+del { color: rgba(255,0,0,.35); }
+del code { color: darkred; }
+</style>
+
 Dart 2 has a few key differences from earlier versions of Dart.
 This page briefly covers those differences and
 gives general advice on migrating your code to Dart 2.
@@ -43,15 +48,15 @@ and web development tools have changed.
   Instead, use the [new build system.][build system]
 * Tools related to web development have changed.
   * The new build system [replaces `pub build` and `pub serve`.][build_runner web]
-  * Dartium is no longer supported. Instead, use [dartdevc][] and Chrome.
-
+  * Dartium is no longer supported. 
+    Instead, use the [`webdev` tool][] and Chrome.
 
 ## Migrating your code {#migration}
 
 How to migrate your code depends on how old your code is
 and what platforms it runs on.
 For help with migrating web apps,
-see the [web app migration guide.][webdev dart2]
+see [Migrating web apps](#web-migration).
 If you're migrating a Flutter app,
 consult the [breaking change notification.][Leaf's email]
 If you publish packages,
@@ -103,6 +108,21 @@ As a package owner, you need to do the following:
 * Respond quickly to issue reports.
 * If code changes aren't backward compatible,
   update the lower SDK constraint.
+
+
+### Migrating web apps {#web-migration}
+
+To update your web app to Dart 2,
+you need to first update your tool usage
+as described in [Tools](#tools).
+
+You'll also need to make the following changes
+to the `<script>` elements referencing your compiled Dart code:
+
+- Drop <del>`<script defer src="packages/browser/dart.js"></script>`</del>
+- Replace <del>`<script defer src="foo.dart" type="application/dart"></script>`</del> by<br>
+  `<script defer src="foo.dart.js"></script>`
+
 
 #### Changes and backward compatibility
 
@@ -164,15 +184,15 @@ environment:
   using Travis to perform continuous integration (CI) testing
 
 [analysis options file]: /guides/language/analysis-options#the-analysis-options-file
-[dartdevc]: /tools/dartdevc
+[`webdev` tool]: /tools/webdev
 [build system]: https://github.com/dart-lang/build/tree/master/docs
 [automated tests]: /guides/testing
-[Flutter analyzer]: {{site.flutter_docs}}/testing/debugging#the-dart-analyzer
+[Flutter analyzer]: {{site.flutter-docs}}/testing/debugging#the-dart-analyzer
 [dart analyze]: /tools/dart-analyze
-[flutter pub upgrade]: {{site.flutter_docs}}/development/packages-and-plugins/using-packages#updating-package-dependencies
+[flutter pub upgrade]: {{site.flutter-docs}}/development/packages-and-plugins/using-packages#updating-package-dependencies
 [dart pub upgrade]: /guides/packages#upgrading-a-dependency
 [dart2_fix]: https://github.com/dart-archive/dart2_fix
-[apiref]: {{site.dart_api}}/dev
+[apiref]: {{site.dart-api}}/dev
 [assert statements]: /guides/language/language-tour#assert
 [build_runner web]: /tools/build_runner
 [compile-time errors]: /guides/language/sound-problems#static-errors-and-warnings
@@ -180,7 +200,7 @@ environment:
 [Dart Language Specification]: /guides/language/spec
 [dart-lang/sdk CHANGELOG]: https://github.com/dart-lang/sdk/blob/main/CHANGELOG.md#200---2018-08-07
 [Fixing Common Type Problems]: /guides/language/sound-problems
-[Flutter SDK upgrade]: {{site.flutter_docs}}/development/tools/sdk/upgrading
+[Flutter SDK upgrade]: {{site.flutter-docs}}/development/tools/sdk/upgrading
 [Dart SDK install]: /get-dart
 [Leaf's email]: https://groups.google.com/d/msg/flutter-dev/H8dDhWg_c8I/_Ql78q_6AgAJ
 [prerelease]: /get-dart#release-channels
@@ -190,5 +210,4 @@ environment:
 [testing]: /guides/testing
 [Updating your pub package to Dart 2,]: https://filiph.medium.com/updating-your-pub-package-to-dart-2-cd8ca343b1be
 [Using constructors]: /guides/language/language-tour#using-constructors
-[webdev dart2]: /web/dart-2
-[sync async start]: https://github.com/dart-lang/sdk/blob/main/docs/newsletter/20170915.md#synchronous-async-start
+[sync async start]: https://github.com/dart-lang/language/blob/master/archive/newsletter/20170915.md#synchronous-async-start

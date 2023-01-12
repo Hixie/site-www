@@ -3,15 +3,14 @@ title: Tools
 description: The tools that support the Dart language.
 ---
 
-When you're ready to create an app,
-get the SDK and tools for your app type.
-If you aren't sure which tools you need, **get the Flutter SDK.**
+When you're ready to create an app, get the SDK and tools for your app
+type. If you aren't sure which tools you need, **get the Flutter SDK.**
 
 <div class="table-wrapper" markdown="1">
 |------------+-----------------------------------+--------------------------|
 | App type   | Get started instructions          | Tool information         |
 |------------|-----------------------------------|--------------------------|
-| Flutter (mobile and more) | [Install Flutter]({{site.flutter_docs}}/get-started/install) | [Flutter tools]({{site.flutter_docs}}/using-ide) |
+| Flutter (mobile and more) | [Install Flutter]({{site.flutter-docs}}/get-started/install) | [Flutter tools]({{site.flutter-docs}}/using-ide) |
 | Web app (non-Flutter) | [Install the Dart SDK](/tools/sdk) | [General-purpose tools][] and [web tools](#web) |
 | Server or command line | [Install the Dart SDK](/tools/sdk) | [General-purpose tools][] and [specialized tools](#server) |
 {:.table .table-striped}
@@ -103,22 +102,12 @@ The Dart SDK includes the following general-purpose `dart` tool:
 : A suite of debugging and performance tools.
 
 
-## Tools for developing web apps {#web}
+## Tool for developing web apps {#web}
 
-The following tools support developing web apps:
+The following tool supports developing web apps:
 
 [`webdev`](/tools/webdev)
-: A CLI for Dart web app development,
-  including building and serving web apps.
-
-[`dart2js`](/tools/dart2js)
-: The original Dart-to-JavaScript compiler, with tree shaking.
-  IDEs and the `webdev` CLI use `dart2js` when building web apps for deployment.
-
-[`dartdevc`](/tools/dartdevc)
-: The Dart dev compiler, a modular Dart-to-JavaScript compiler.
-  IDEs and the `webdev` CLI use `dartdevc` when running a development server.
-
+: A CLI to build and serve Dart web apps.
 
 ## Tools for developing command-line apps and servers {#server}
 

@@ -245,87 +245,77 @@ void error([String? message = null]) {
 }
 {% endprettify %}
 
+<a id="prefer-using--to-convert-null-to-a-boolean-value"></a>
+### DON'T use `true` or `false` in equality operations
 
-### PREFER using `??` to convert `null` to a boolean value.
-
-This rule applies when an expression can evaluate to `true`, `false`, or `null`,
-and you need to pass the result to something that expects a non-nullable boolean
-value. A common case is using the result of a null-aware method call as a
-condition. You can "convert" `null` to `true` or `false` using `==`, but we
-recommend using `??`:
+Using the equality operator to evaluate a *non-nullable* boolean expression 
+against a boolean literal is redundant. 
+It's always simpler to eliminate the equality operator, 
+and use the unary negation operator `!` if necessary:
 
 {:.good}
-<?code-excerpt "usage_good.dart (convert-null-aware)"?>
+<?code-excerpt "usage_good.dart (non-null-boolean-expression)"?>
 {% prettify dart tag=pre+code %}
-// If you want null to be false:
-if (optionalThing?.isEnabled ?? false) {
-  print('Have enabled thing.');
-}
+if (nonNullableBool) { ... }
 
-// If you want null to be true:
-if (optionalThing?.isEnabled ?? true) {
-  print('Have enabled thing or nothing.');
-}
+if (!nonNullableBool) { ... }
 {% endprettify %}
 
 {:.bad}
-<?code-excerpt "usage_bad.dart (convert-null-equals)"?>
+<?code-excerpt "usage_bad.dart (non-null-boolean-expression)"?>
 {% prettify dart tag=pre+code %}
-// If you want null to be false:
-if (optionalThing?.isEnabled == true) {
-  print('Have enabled thing.');
-}
+if (nonNullableBool == true) { ... }
 
-// If you want null to be true:
-if (optionalThing?.isEnabled != false) {
-  print('Have enabled thing or nothing.');
-}
+if (nonNullableBool == false) { ... }
 {% endprettify %}
 
-Both operations produce the same result and do the right thing, but `??` is
-preferred for three main reasons:
-
-*   The `??` operator signals that the code has something to do with `null`.
-
-*   The `== true` looks like a common mistake where the equality operator is
-    redundant and can be removed. That's true when the boolean expression on the
-    left will not produce `null`, but not when it can.
-
-*   The `?? false` and `?? true` clearly show what value will be used when the
-    expression is `null`. With `== true`, you have to think through the boolean
-    logic to realize that means that a `null` gets converted to *false*.
-
-**Exception:** Using a null-aware operator on a variable inside a condition
-doesn't promote the variable to a non-nullable type. If you want the variable
-to be promoted inside the body of the `if` statement, it might be better to use
-an explicit `!= null` check instead of `?.` followed by `??`:
+To evaluate a boolean expression that *is nullable*, you should use `??`
+or an explicit `!= null` check.
 
 {:.good}
-<?code-excerpt "usage_good.dart (null-aware-promote)"?>
+<?code-excerpt "usage_good.dart (nullable-boolean-expression)"?>
 {% prettify dart tag=pre+code %}
-int measureMessage(String? message) {
-  if (message != null && message.isNotEmpty) {
-    // message is promoted to String.
-    return message.length;
-  }
+// If you want null to result in false:
+if (nullableBool ?? false) { ... }
 
-  return 0;
-}
+// If you want null to result in false
+// and you want the variable to type promote:
+if (nullableBool != null && nullableBool) { ... }
 {% endprettify %}
 
 {:.bad}
-<?code-excerpt "usage_bad.dart (null-aware-promote)"?>
+<?code-excerpt "usage_bad.dart (nullable-boolean-expression)"?>
 {% prettify dart tag=pre+code %}
-int measureMessage(String? message) {
-  if (message?.isNotEmpty ?? false) {
-    // message is not promoted to String.
-    return message!.length;
-  }
+// Static error if null:
+if (nullableBool) { ... }
 
-  return 0;
-}
+// If you want null to be false:
+if (nullableBool == true) { ... }
 {% endprettify %}
 
+`nullableBool == true` is a viable expression, 
+but shouldn't be used for several reasons:
+
+* It doesn't indicate the code has anything to do with `null`.
+
+* Because it's not evidently `null` related, 
+  it can easily be mistaken for the non-nullable case,
+  where the equality operator is redundant and can be removed.
+  That’s only true when the boolean expression on the left
+  has no chance of producing null, but not when it can.
+
+* The boolean logic is confusing. If `nullableBool` is null, 
+  then `nullableBool == true` means the condition evaluates to `false`.
+
+The `??` operator makes it clear that something to do with null is happening,
+so it won't be mistaken for a redundant operation. 
+The logic is much clearer too; 
+the result of the expression being `null` is the same as the boolean literal.
+
+Using a null-aware operator such as `??` on a variable inside a condition
+doesn’t promote the variable to a non-nullable type. 
+If you want the variable to be promoted inside the body of the `if` statement,
+it's better to use an explicit `!= null` check instead of `??`. 
 
 ### AVOID `late` variables if you need to check whether they are initialized.
 
@@ -421,8 +411,8 @@ Here are some best practices to keep in mind when composing strings in Dart.
 
 {% include linter-rule-mention.md rule="prefer_adjacent_string_concatenation" %}
 
-If you have two string literals&mdash;not values, but the actual quoted literal
-form&mdash;you do not need to use `+` to concatenate them. Just like in C and
+If you have two string literals—not values, but the actual quoted literal
+form—you do not need to use `+` to concatenate them. Just like in C and
 C++, simply placing them next to each other does it. This is a good way to make
 a single long string that doesn't fit on one line.
 
@@ -558,7 +548,7 @@ The [Iterable][] contract does not require that a collection know its length or
 be able to provide it in constant time. Calling `.length` just to see if the
 collection contains *anything* can be painfully slow.
 
-[iterable]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterable-class.html
+[iterable]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterable-class.html
 
 Instead, there are faster and more readable getters: `.isEmpty` and
 `.isNotEmpty`. Use the one that doesn't require you to negate the result.
@@ -694,7 +684,7 @@ That's verbose and causes two wrappers to be created, with two layers of
 indirection and redundant runtime checking. Fortunately, the core library has
 the [`whereType()`][where-type] method for this exact use case:
 
-[where-type]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterable/whereType.html
+[where-type]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterable/whereType.html
 
 {:.good}
 <?code-excerpt "../../test/effective_dart_test.dart (whereType)"?>
@@ -717,7 +707,7 @@ existing transformations can change the type.
 If you're already calling `toList()`, replace that with a call to
 [`List<T>.from()`][list-from] where `T` is the type of resulting list you want.
 
-[list-from]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/List/List.from.html
+[list-from]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/List/List.from.html
 
 {:.good}
 <?code-excerpt "usage_good.dart (cast-list)"?>
@@ -847,7 +837,7 @@ int median(List<Object> objects) {
 {% endprettify %}
 
 These alternatives don't always work, of course, and sometimes `cast()` is the
-right answer. But consider that method a little risky and undesirable&mdash;it
+right answer. But consider that method a little risky and undesirable—it
 can be slow and may fail at runtime if you aren't careful.
 
 
@@ -894,7 +884,7 @@ void main() {
 {% include linter-rule-mention.md rule="unnecessary_lambdas" %}
 
 When you refer to a function, method, or named constructor but omit the
-parentheses, Dart creates a _tear-off_&mdash;a closure that takes the same
+parentheses, Dart creates a _tear-off_—a closure that takes the same
 parameters as the function and invokes the underlying function when you call it.
 If all you need is a closure that invokes a named function with the same
 parameters as the closure accepts, don't manually wrap the call in a lambda.
@@ -1012,7 +1002,7 @@ calculations that we could recalculate from other data we already have. They are
 trading increased memory for reduced CPU usage. Do we know we have a performance
 problem that merits that trade-off?
 
-Worse, the code is *wrong*. The problem with caches is *invalidation*&mdash;how
+Worse, the code is *wrong*. The problem with caches is *invalidation*—how
 do you know when the cache is out of date and needs to be recalculated? Here, we
 never do, even though `radius` is mutable. You can assign a different value and
 the `area` and `circumference` will retain their previous, now incorrect values.
@@ -1115,8 +1105,6 @@ class Box {
 
 ### PREFER using a `final` field to make a read-only property.
 
-{% include linter-rule-mention.md rule="unnecessary_getters_setters" %}
-
 If you have a field that outside code should be able to see but not assign to, a
 simple solution that works in many cases is to simply mark it `final`.
 
@@ -1161,8 +1149,8 @@ String capitalize(String name) =>
 
 People *writing* code seem to love `=>`, but it's very easy to abuse it and end
 up with code that's hard to *read*. If your declaration is more than a couple of
-lines or contains deeply nested expressions&mdash;cascades and conditional
-operators are common offenders&mdash;do yourself and everyone who has to read
+lines or contains deeply nested expressions—cascades and conditional
+operators are common offenders—do yourself and everyone who has to read
 your code a favor and use a block body and some statements.
 
 {:.good}
@@ -1202,8 +1190,8 @@ set x(num value) => center = Point(value, center.y);
 {% include linter-rule-mention.md rule="unnecessary_this" %}
 
 JavaScript requires an explicit `this.` to refer to members on the object whose
-method is currently being executed, but Dart&mdash;like C++, Java, and
-C#&mdash;doesn't have that limitation.
+method is currently being executed, but Dart—like C++, Java, and
+C#—doesn't have that limitation.
 
 There are only two times you need to use `this.`. One is when a local variable
 with the same name shadows the member you want to access:
@@ -1288,7 +1276,7 @@ class Box extends BaseBox {
 {% endprettify %}
 
 This looks surprising, but works like you want. Fortunately, code like this is
-relatively rare thanks to initializing formals.
+relatively rare thanks to initializing formals and super initializers.
 
 
 ### DO initialize fields at their declaration when possible.
@@ -1324,7 +1312,7 @@ class ProfileMark {
 {% endprettify %}
 
 Some fields can't be initialized at their declarations because they need to reference
-`this` — to use other fields or call methods, for example. However, if the
+`this`—to use other fields or call methods, for example. However, if the
 field is marked `late`, then the initializer *can* access `this`.
 
 Of course, if a field depends on constructor parameters, or is initialized
@@ -1490,7 +1478,7 @@ expression inside:
 * A const constructor call
 * A metadata annotation.
 * The initializer for a const variable declaration.
-* A switch case expression&mdash;the part right after `case` before the `:`, not
+* A switch case expression—the part right after `case` before the `:`, not
   the body of the case.
 
 (Default values are not included in this list because future versions of Dart
@@ -1700,7 +1688,7 @@ Future<void> asyncError() async {
   throw 'Error!';
 }
 
-Future<void> asyncValue() async => 'value';
+Future<String> asyncValue() async => 'value';
 {% endprettify %}
 
 ### CONSIDER using higher-order methods to transform a stream.
@@ -1734,7 +1722,7 @@ primitives, and interfacing with asynchronous code that doesn't use futures.
 Most other code should use async/await or [`Future.then()`][then], because
 they're clearer and make error handling easier.
 
-[then]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Future/then.html
+[then]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Future/then.html
 
 {:.good}
 <?code-excerpt "usage_good.dart (avoid-completer)"?>
@@ -1804,9 +1792,9 @@ In the bad example, if you pass it a `Future<Object>`, it incorrectly treats it
 like a bare, synchronous value.
 
 [pokemon]: https://blog.codinghorror.com/new-programming-jargon/
-[Error]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Error-class.html
-[StackOverflowError]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/StackOverflowError-class.html
-[OutOfMemoryError]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/OutOfMemoryError-class.html
-[ArgumentError]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/ArgumentError-class.html
-[AssertionError]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/AssertionError-class.html
-[Exception]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Exception-class.html
+[Error]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Error-class.html
+[StackOverflowError]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/StackOverflowError-class.html
+[OutOfMemoryError]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/OutOfMemoryError-class.html
+[ArgumentError]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/ArgumentError-class.html
+[AssertionError]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/AssertionError-class.html
+[Exception]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Exception-class.html

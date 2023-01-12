@@ -283,6 +283,7 @@ The analyzer produces the following diagnostics for code that
 doesn't conform to the language specification or
 that might work in unexpected ways.
 
+[ffi]: https://dart.dev/guides/libraries/c-interop
 [meta-doNotStore]: https://pub.dev/documentation/meta/latest/meta/doNotStore-constant.html
 [meta-factory]: https://pub.dev/documentation/meta/latest/meta/factory-constant.html
 [meta-immutable]: https://pub.dev/documentation/meta/latest/meta/immutable-constant.html
@@ -295,6 +296,221 @@ that might work in unexpected ways.
 [meta-UseResult]: https://pub.dev/documentation/meta/latest/meta/UseResult-class.html
 [meta-visibleForOverriding]: https://pub.dev/documentation/meta/latest/meta/visibleForOverriding-constant.html
 [meta-visibleForTesting]: https://pub.dev/documentation/meta/latest/meta/visibleForTesting-constant.html
+
+### abi_specific_integer_invalid
+
+_Classes extending 'AbiSpecificInteger' must have exactly one const constructor,
+no other members, and no type parameters._
+
+#### Description
+
+The analyzer produces this diagnostic when a class that extends
+`AbiSpecificInteger` doesn't meet all of the following requirements:
+- there must be exactly one constructor
+- the constructor must be marked `const`
+- there must not be any members of other than the one constructor
+- there must not be any type parameters
+
+#### Examples
+
+The following code produces this diagnostic because the class `C` doesn't
+define a const constructor:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class [!C!] extends AbiSpecificInteger {
+}
+{% endprettify %}
+
+The following code produces this diagnostic because the constructor isn't
+a `const` constructor:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class [!C!] extends AbiSpecificInteger {
+  C();
+}
+{% endprettify %}
+
+The following code produces this diagnostic because the class `C` defines
+multiple constructors:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class [!C!] extends AbiSpecificInteger {
+  const C.zero();
+  const C.one();
+}
+{% endprettify %}
+
+The following code produces this diagnostic because the class `C` defines
+a field:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class [!C!] extends AbiSpecificInteger {
+  final int i;
+
+  const C(this.i);
+}
+{% endprettify %}
+
+The following code produces this diagnostic because the class `C` has a
+type parameter:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class [!C!]<T> extends AbiSpecificInteger { // type parameters
+  const C();
+}
+{% endprettify %}
+
+#### Common fixes
+
+Change the class so that it meets the requirements of having no type
+parameters and a single member that is a `const` constructor:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class C extends AbiSpecificInteger {
+  const C();
+}
+{% endprettify %}
+
+### abi_specific_integer_mapping_extra
+
+_Classes extending 'AbiSpecificInteger' must have exactly one
+'AbiSpecificIntegerMapping' annotation specifying the mapping from ABI to a 'NativeType' integer with a fixed size._
+
+#### Description
+
+The analyzer produces this diagnostic when a class that extends
+`AbiSpecificInteger` has more than one `AbiSpecificIntegerMapping`
+annotation.
+
+#### Example
+
+The following code produces this diagnostic because there are two
+`AbiSpecificIntegerMapping` annotations on the class `C`:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+@[!AbiSpecificIntegerMapping!]({Abi.linuxX64 : Uint16()})
+class C extends AbiSpecificInteger {
+  const C();
+}
+{% endprettify %}
+
+#### Common fixes
+
+Remove all but one of the annotations, merging the arguments as
+appropriate:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8(), Abi.linuxX64 : Uint16()})
+class C extends AbiSpecificInteger {
+  const C();
+}
+{% endprettify %}
+
+### abi_specific_integer_mapping_missing
+
+_Classes extending 'AbiSpecificInteger' must have exactly one
+'AbiSpecificIntegerMapping' annotation specifying the mapping from ABI to a 'NativeType' integer with a fixed size._
+
+#### Description
+
+The analyzer produces this diagnostic when a class that extends
+`AbiSpecificInteger` doesn't have an `AbiSpecificIntegerMapping`
+annotation.
+
+#### Example
+
+The following code produces this diagnostic because there's no
+`AbiSpecificIntegerMapping` annotation on the class `C`:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+class [!C!] extends AbiSpecificInteger {
+  const C();
+}
+{% endprettify %}
+
+#### Common fixes
+
+Add an `AbiSpecificIntegerMapping` annotation to the class:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class C extends AbiSpecificInteger {
+  const C();
+}
+{% endprettify %}
+
+### abi_specific_integer_mapping_unsupported
+
+_Invalid mapping to '{0}'; only mappings to 'Int8', 'Int16', 'Int32', 'Int64',
+'Uint8', 'Uint16', 'UInt32', and 'Uint64' are supported._
+
+#### Description
+
+The analyzer produces this diagnostic when a value in the map argument of
+an `AbiSpecificIntegerMapping` annotation is anything other than one of
+the following integer types:
+- `Int8`
+- `Int16`
+- `Int32`
+- `Int64`
+- `Uint8`
+- `Uint16`
+- `UInt32`
+- `Uint64`
+
+#### Example
+
+The following code produces this diagnostic because the value of the map
+entry is `Array<Uint8>`, which isn't a valid integer type:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : [!Array<Uint8>(4)!]})
+class C extends AbiSpecificInteger {
+  const C();
+}
+{% endprettify %}
+
+#### Common fixes
+
+Use one of the valid types as a value in the map:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+@AbiSpecificIntegerMapping({Abi.macosX64 : Int8()})
+class C extends AbiSpecificInteger {
+  const C();
+}
+{% endprettify %}
 
 ### abstract_field_initializer
 
@@ -686,7 +902,7 @@ The analyzer produces this diagnostic when a field that's declared in a
 subclass of `Struct` and has the type `Pointer` also has an annotation
 associated with it.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -728,7 +944,7 @@ argument whose value isn't a constant expression.
 The analyzer also produces this diagnostic when the value of the
 `exceptionalReturn` argument of `Pointer.fromFunction`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -1208,7 +1424,7 @@ void f() {
 
 ### assignment_to_final_no_setter
 
-_There isn’t a setter named '{0}' in class '{1}'._
+_There isn't a setter named '{0}' in class '{1}'._
 
 #### Description
 
@@ -1549,6 +1765,52 @@ class C<T> {
 }
 {% endprettify %}
 
+### body_might_complete_normally_catch_error
+
+_This 'onError' handler must return a value assignable to '{0}', but ends
+without returning a value._
+
+#### Description
+
+The analyzer produces this diagnostic when the closure passed to the
+`onError` parameter of the `Future.catchError` method is required to
+return a non-`null` value (because of the `Future`s type argument) but can
+implicitly return `null`.
+
+#### Example
+
+The following code produces this diagnostic because the closure passed to
+the `catchError` method is required to return an `int` but doesn't end
+with an explicit `return`, causing it to implicitly return `null`:
+
+{% prettify dart tag=pre+code %}
+void g(Future<int> f) {
+  f.catchError((e, st) [!{!]});
+}
+{% endprettify %}
+
+#### Common fixes
+
+If the closure should sometimes return a non-`null` value, then add an
+explicit return to the closure:
+
+{% prettify dart tag=pre+code %}
+void g(Future<int> f) {
+  f.catchError((e, st) {
+    return -1;
+  });
+}
+{% endprettify %}
+
+If the closure should always return `null`, then change the type argument
+of the `Future` to be either `void` or `Null`:
+
+{% prettify dart tag=pre+code %}
+void g(Future<void> f) {
+  f.catchError((e, st) {});
+}
+{% endprettify %}
+
 ### body_might_complete_normally_nullable
 
 _This function has a nullable return type of '{0}', but ends without returning a
@@ -1685,7 +1947,7 @@ _The built-in identifier '{0}' can't be used as an extension name._
 
 The analyzer produces this diagnostic when the name used in the declaration
 of a class, extension, mixin, typedef, type parameter, or import prefix is
-a built-in identifier. Built-in identifiers can’t be used to name any of
+a built-in identifier. Built-in identifiers can't be used to name any of
 these kinds of declarations.
 
 #### Example
@@ -1894,6 +2156,85 @@ void f(int s) {
 }
 {% endprettify %}
 
+### cast_from_nullable_always_fails
+
+_This cast will always throw an exception because the nullable local variable
+'{0}' is not assigned._
+
+#### Description
+
+The analyzer produces this diagnostic when a local variable that has a
+nullable type hasn't been assigned and is cast to a non-nullable type.
+Because the variable hasn't been assigned it has the default value of
+`null`, causing the cast to throw an exception.
+
+#### Example
+
+The following code produces this diagnostic because the variable `x` is
+cast to a non-nullable type (`int`) when it's known to have the value
+`null`:
+
+{% prettify dart tag=pre+code %}
+void f() {
+  num? x;
+  [!x!] as int;
+  print(x);
+}
+{% endprettify %}
+
+#### Common fixes
+
+If the variable is expected to have a value before the cast, then add an
+initializer or an assignment:
+
+{% prettify dart tag=pre+code %}
+void f() {
+  num? x = 3;
+  x as int;
+  print(x);
+}
+{% endprettify %}
+
+If the variable isn't expected to be assigned, then remove the cast:
+
+{% prettify dart tag=pre+code %}
+void f() {
+  num? x;
+  print(x);
+}
+{% endprettify %}
+
+### cast_from_null_always_fails
+
+_This cast always throws an exception because the expression always evaluates to
+'null'._
+
+#### Description
+
+The analyzer produces this diagnostic when an expression whose type is
+`Null` is being cast to a non-nullable type.
+
+#### Example
+
+The following code produces this diagnostic because `n` is known to always
+be `null`, but it's being cast to a non-nullable type:
+
+{% prettify dart tag=pre+code %}
+void f(Null n) {
+  [!n as int!];
+}
+{% endprettify %}
+
+#### Common fixes
+
+Remove the unnecessary cast:
+
+{% prettify dart tag=pre+code %}
+void f(Null n) {
+  n;
+}
+{% endprettify %}
+
 ### cast_to_non_type
 
 _The name '{0}' isn't a type, so it can't be used in an 'as' expression._
@@ -1962,7 +2303,7 @@ literal contains `a.zero`, which is imported using a `deferred` import:
 {% prettify dart tag=pre+code %}
 import 'a.dart' deferred as a;
 
-var l = const [[!a.zero!]];
+var l = const [a.[!zero!]];
 {% endprettify %}
 
 #### Common fixes
@@ -1990,6 +2331,42 @@ suitable value:
 
 {% prettify dart tag=pre+code %}
 var l = const [0];
+{% endprettify %}
+
+### compound_implements_finalizable
+
+_The class '{0}' can't implement Finalizable._
+
+#### Description
+
+The analyzer produces this diagnostic when a subclass of either `Struct`
+or `Union` implements `Finalizable`.
+
+For more information about FFI, see [C interop using dart:ffi][ffi].
+
+#### Example
+
+The following code produces this diagnostic because the class `S`
+implements `Finalizable`:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+class [!S!] extends Struct implements Finalizable {
+  external Pointer notEmpty;
+}
+{% endprettify %}
+
+#### Common fixes
+
+Try removing the implements clause from the class:
+
+{% prettify dart tag=pre+code %}
+import 'dart:ffi';
+
+class S extends Struct {
+  external Pointer notEmpty;
+}
 {% endprettify %}
 
 ### concrete_class_has_enum_superinterface
@@ -2560,7 +2937,7 @@ being initialized using the constant `math.pi` from the library
 {% prettify dart tag=pre+code %}
 import 'dart:math' deferred as math;
 
-const pi = [!math.pi!];
+const pi = math.[!pi!];
 {% endprettify %}
 
 #### Common fixes
@@ -2982,7 +3359,7 @@ instantiated by a generative constructor._
 The analyzer produces this diagnostic when a subclass of either `Struct`
 or `Union` is instantiated using a generative constructor.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -3130,7 +3507,7 @@ never reached._
 #### Description
 
 The analyzer produces this diagnostic when a `catch` clause is found that
-can't be executed because it’s after a `catch` clause of the form
+can't be executed because it's after a `catch` clause of the form
 `catch (e)` or `on Object catch (e)`. The first `catch` clause that matches
 the thrown object is selected, and both of those forms will match any
 object, so no `catch` clauses that follow them will be selected.
@@ -3174,7 +3551,7 @@ void f() {
 
 ### dead_code_on_catch_subtype
 
-_Dead code: This on-catch block won’t be executed because '{0}' is a subtype of
+_Dead code: This on-catch block won't be executed because '{0}' is a subtype of
 '{1}' and hence will have been caught already._
 
 #### Description
@@ -3601,6 +3978,87 @@ dependencies:
   meta: ^1.0.2
 ```
 
+### deprecated_colon_for_default_value
+
+_Using a colon as a separator before a default value is deprecated and will not
+be supported in language version 3.0 and later._
+
+#### Description
+
+The analyzer produces this diagnostic when a colon is used as the
+separator before the default value of an optional parameter. While this
+syntax is allowed, it's being deprecated in favor of using an equal sign.
+
+#### Example
+
+The following code produces this diagnostic because a colon is being used
+before the default value of the optional parameter `i`:
+
+{% prettify dart tag=pre+code %}
+void f({int i [!:!] 0}) {}
+{% endprettify %}
+
+#### Common fixes
+
+Replace the colon with an equal sign.
+
+{% prettify dart tag=pre+code %}
+void f({int i = 0}) {}
+{% endprettify %}
+
+### deprecated_export_use
+
+_The ability to import '{0}' indirectly is deprecated._
+
+#### Description
+
+The analyzer produces this diagnostic when one library imports a name from
+a second library, and the second library exports the name from a third
+library but has indicated that it won't export the third library in the
+future.
+
+#### Example
+
+Given a library `a.dart` defining the class `A`:
+
+{% prettify dart tag=pre+code %}
+class A {}
+{% endprettify %}
+
+And a second library `b.dart` that exports `a.dart` but has marked the
+export as being deprecated:
+
+{% prettify dart tag=pre+code %}
+import 'a.dart';
+
+@deprecated
+export 'a.dart';
+{% endprettify %}
+
+The following code produces this diagnostic because the class `A` won't be
+exported from `b.dart` in some future version:
+
+{% prettify dart tag=pre+code %}
+import 'b.dart';
+
+[!A!]? a;
+{% endprettify %}
+
+#### Common fixes
+
+If the name is available from a different library that you can import,
+then replace the existing import with an import for that library (or add
+an import for the defining library if you still need the old import):
+
+{% prettify dart tag=pre+code %}
+import 'a.dart';
+
+A? a;
+{% endprettify %}
+
+If the name isn't available, then look for instructions from the library
+author or contact them directly to find out how to update your code.
+
 ### deprecated_field
 
 _The '{0}' field is no longer used and can be removed._
@@ -3633,7 +4091,7 @@ name: example
 
 _'{0}' is deprecated and shouldn't be used._
 
-_'{0}' is deprecated and shouldn't be used. {1}._
+_'{0}' is deprecated and shouldn't be used. {1}_
 
 #### Description
 
@@ -3660,7 +4118,7 @@ should indicate what code to use in place of the deprecated code.
 
 _'{0}' is deprecated and shouldn't be used._
 
-_'{0}' is deprecated and shouldn't be used. {1}._
+_'{0}' is deprecated and shouldn't be used. {1}_
 
 #### Description
 
@@ -3809,6 +4267,33 @@ void f() {
 }
 {% endprettify %}
 
+### division_optimization
+
+_The operator x ~/ y is more efficient than (x / y).toInt()._
+
+#### Description
+
+The analyzer produces this diagnostic when the result of dividing two
+numbers is converted to an integer using `toInt`. Dart has a built-in
+integer division operator that is both more efficient and more concise.
+
+#### Example
+
+The following code produces this diagnostic because the result of dividing
+`x` and `y` is converted to an integer using `toInt`:
+
+{% prettify dart tag=pre+code %}
+int divide(num x, num y) => [!(x / y).toInt()!];
+{% endprettify %}
+
+#### Common fixes
+
+Use the integer division operator (`~/`):
+
+{% prettify dart tag=pre+code %}
+int divide(num x, num y) => x ~/ y;
+{% endprettify %}
+
 ### duplicate_constructor
 
 _The constructor with name '{0}' is already defined._
@@ -3879,7 +4364,7 @@ class C {
 {% endprettify %}
 
 If there are multiple named constructors and all except one of them are
-unneeded, then remove the constructorsthat aren't needed:
+unneeded, then remove the constructors that aren't needed:
 
 {% prettify dart tag=pre+code %}
 class C {
@@ -3913,6 +4398,34 @@ Choose a different name for one of the declarations.
 {% prettify dart tag=pre+code %}
 int x = 0;
 int y = 1;
+{% endprettify %}
+
+### duplicate_export
+
+_Duplicate export._
+
+#### Description
+
+The analyzer produces this diagnostic when an export directive is found
+that is the same as an export before it in the file. The second export
+doesn't add value and should be removed.
+
+#### Example
+
+The following code produces this diagnostic because the same library is
+being exported twice:
+
+{% prettify dart tag=pre+code %}
+export 'package:meta/meta.dart';
+export [!'package:meta/meta.dart'!];
+{% endprettify %}
+
+#### Common fixes
+
+Remove the unnecessary export:
+
+{% prettify dart tag=pre+code %}
+export 'package:meta/meta.dart';
 {% endprettify %}
 
 ### duplicate_field_formal_parameter
@@ -4048,7 +4561,7 @@ _Duplicate import._
 
 The analyzer produces this diagnostic when an import directive is found
 that is the same as an import before it in the file. The second import
-doesn’t add value and should be removed.
+doesn't add value and should be removed.
 
 #### Example
 
@@ -4208,7 +4721,7 @@ The analyzer produces this diagnostic when a subclass of `Struct` or
 `Union` doesn't have any fields. Having an empty `Struct` or `Union`
 isn't supported.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -5266,7 +5779,7 @@ The analyzer produces this diagnostic when a field in a subclass of
 `Struct` has more than one annotation describing the native type of the
 field.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -5382,7 +5895,7 @@ The analyzer produces this diagnostic when a field in a subclass of
 `Struct` has more than one annotation describing the size of the native
 array.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -5597,7 +6110,7 @@ initializers._
 The analyzer produces this diagnostic when a constructor in a subclass of
 either `Struct` or `Union` has one or more field initializers.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -5862,7 +6375,7 @@ _Fields in subclasses of 'Struct' and 'Union' can't have initializers._
 The analyzer produces this diagnostic when a field in a subclass of
 `Struct` has an initializer.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -5900,7 +6413,7 @@ _Fields of 'Struct' and 'Union' subclasses must be marked external._
 The analyzer produces this diagnostic when a field in a subclass of either
 `Struct` or `Union` isn't marked as being `external`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -6326,7 +6839,7 @@ _The class '{0}' can't extend 'Struct' or 'Union' because '{0}' is generic._
 The analyzer produces this diagnostic when a subclass of either `Struct`
 or `Union` has a type parameter.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -6658,7 +7171,7 @@ imported, then add a prefix to the import so that the local definition of
 the name doesn't shadow the imported name.
 
 If the name is the name of an existing class or mixin that isn't being
-imported, then add an import, with a prefix, for the library in which it’s
+imported, then add an import, with a prefix, for the library in which it's
 declared.
 
 Otherwise, either replace the name in the `implements` clause with the name
@@ -6697,10 +7210,13 @@ class B implements A {}
 
 _'{0}' can't be used in both the 'extends' and 'implements' clauses._
 
+_'{0}' can't be used in both the 'extends' and 'with' clauses._
+
 #### Description
 
-The analyzer produces this diagnostic when one class is listed in both the
-`extends` and `implements` clauses of another class.
+The analyzer produces this diagnostic when a class is listed in the
+`extends` clause of a class declaration and also in either the
+`implements` or `with` clause of the same declaration.
 
 #### Example
 
@@ -6711,6 +7227,15 @@ in both the `extends` and `implements` clauses for the class `B`:
 class A {}
 
 class B extends A implements [!A!] {}
+{% endprettify %}
+
+The following code produces this diagnostic because the class `A` is used
+in both the `extends` and `with` clauses for the class `B`:
+
+{% prettify dart tag=pre+code %}
+class A {}
+
+class B extends A with [!A!] {}
 {% endprettify %}
 
 #### Common fixes
@@ -6940,10 +7465,6 @@ void f() {
 }
 {% endprettify %}
 
-If type arguments shouldn't be required for the class, then mark the class
-with the `[optionalTypeArgs][meta-optionalTypeArgs]` annotation (from
-`package:meta`):
-
 ### import_internal_library
 
 _The library '{0}' is internal and can't be imported._
@@ -7019,8 +7540,6 @@ Given a [part file][] named `part.dart` containing the following:
 
 {% prettify dart tag=pre+code %}
 part of lib;
-
-class C{}
 {% endprettify %}
 
 The following code produces this diagnostic because imported files can't
@@ -7030,8 +7549,6 @@ have a part-of directive:
 library lib;
 
 import [!'part.dart'!];
-
-C c = C();
 {% endprettify %}
 
 #### Common fixes
@@ -7315,7 +7832,7 @@ access a static member through an instance of the class.
 #### Example
 
 The following code produces this diagnostic because `zero` is a static
-field, but it’s being accessed as if it were an instance field:
+field, but it's being accessed as if it were an instance field:
 
 {% prettify dart tag=pre+code %}
 void f(C c) {
@@ -7507,7 +8024,7 @@ _Type aliases that expand to a type parameter can't be instantiated._
 
 The analyzer produces this diagnostic when a constructor invocation is
 found where the type being instantiated is a type alias for one of the type
-parameters of the type alias. This isn’t allowed because the value of the
+parameters of the type alias. This isn't allowed because the value of the
 type parameter is a type rather than a class.
 
 #### Example
@@ -7705,7 +8222,7 @@ class C {
   const C(double d);
 }
 
-@C([!math.pi!])
+@C(math.[!pi!])
 void f () {}
 {% endprettify %}
 
@@ -7835,7 +8352,7 @@ int i = 0;
 String s = i.toString();
 {% endprettify %}
 
-If you can’t change the value, then change the type of the variable to be
+If you can't change the value, then change the type of the variable to be
 compatible with the type of the value being assigned:
 
 {% prettify dart tag=pre+code %}
@@ -7903,7 +8420,7 @@ The analyzer produces this diagnostic when an invocation of the method
 value) and the type to be returned from the invocation is either `void`,
 `Handle` or `Pointer`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -8181,14 +8698,26 @@ class C {
 
 #### Common fixes
 
-If the factory returns an instance of the surrounding class, then rename
-the factory:
+If the factory returns an instance of the surrounding class, and you
+intend it to be an unnamed factory constructor, then rename the factory:
 
 {% prettify dart tag=pre+code %}
 class A {}
 
 class C {
   factory C() => throw 0;
+}
+{% endprettify %}
+
+If the factory returns an instance of the surrounding class, and you
+intend it to be a named factory constructor, then prefix the name of the
+factory constructor with the name of the surrounding class:
+
+{% prettify dart tag=pre+code %}
+class A {}
+
+class C {
+  factory C.a() => throw 0;
 }
 {% endprettify %}
 
@@ -8226,7 +8755,7 @@ The analyzer produces this diagnostic when a field in a subclass of
 `Struct` has a type other than `int`, `double`, `Array`, `Pointer`, or
 subtype of `Struct` or `Union`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -8624,6 +9153,83 @@ class C {
 }
 {% endprettify %}
 
+### invalid_non_virtual_annotation
+
+_The annotation '@nonVirtual' can only be applied to a concrete instance
+member._
+
+#### Description
+
+The analyzer produces this diagnostic when the `nonVirtual` annotation is
+found on a declaration other than a member of a class, mixin, or enum, or
+if the member isn't a concrete instance member.
+
+#### Examples
+
+The following code produces this diagnostic because the annotation is on a
+class declaration rather than a member inside the class:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+[!@nonVirtual!]
+class C {}
+{% endprettify %}
+
+The following code produces this diagnostic because the method `m` is an
+abstract method:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+abstract class C {
+  [!@nonVirtual!]
+  void m();
+}
+{% endprettify %}
+
+The following code produces this diagnostic because the method `m` is a
+static method:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+abstract class C {
+  [!@nonVirtual!]
+  static void m() {}
+}
+{% endprettify %}
+
+#### Common fixes
+
+If the declaration isn't a member of a class, mixin, or enum, then remove
+the annotation:
+
+{% prettify dart tag=pre+code %}
+class C {}
+{% endprettify %}
+
+If the member is intended to be a concrete instance member, then make it
+so:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+abstract class C {
+  @nonVirtual
+  void m() {}
+}
+{% endprettify %}
+
+If the member is not intended to be a concrete instance member, then
+remove the annotation:
+
+{% prettify dart tag=pre+code %}
+abstract class C {
+  static void m() {}
+}
+{% endprettify %}
+
 ### invalid_null_aware_operator
 
 _The receiver can't be null because of short-circuiting, so the null-aware
@@ -8761,6 +9367,67 @@ class B extends A {
 }
 {% endprettify %}
 
+### invalid_override_of_non_virtual_member
+
+_The member '{0}' is declared non-virtual in '{1}' and can't be overridden in
+subclasses._
+
+#### Description
+
+The analyzer produces this diagnostic when a member of a class, mixin, or
+enum overrides a member that has the `@nonVirtual` annotation on it.
+
+#### Example
+
+The following code produces this diagnostic because the method `m` in `B`
+overrides the method `m` in `A`, and the method `m` in `A` is annotated
+with the `@nonVirtual` annotation:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+class A {
+  @nonVirtual
+  void m() {}
+}
+
+class B extends A {
+  @override
+  void [!m!]() {}
+}
+{% endprettify %}
+
+#### Common fixes
+
+If the annotation on the method in the superclass is correct (the method
+in the superclass is not intended to be overridden), then remove or rename
+the overriding method:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+class A {
+  @nonVirtual
+  void m() {}
+}
+
+class B extends A {}
+{% endprettify %}
+
+If the method in the superclass is intended to be overridden, then remove
+the `@nonVirtual` annotation:
+
+{% prettify dart tag=pre+code %}
+class A {
+  void m() {}
+}
+
+class B extends A {
+  @override
+  void m() {}
+}
+{% endprettify %}
+
 ### invalid_reference_to_generative_enum_constructor
 
 _Generative enum constructors can only be used as targets of redirection._
@@ -8784,7 +9451,7 @@ enum E {
   const E(int x);
 }
 
-E f() => const [!E!](2); 
+E f() => const [!E!](2);
 {% endprettify %}
 
 #### Common fixes
@@ -8799,7 +9466,7 @@ enum E {
   const E(int x);
 }
 
-E f() => E.b; 
+E f() => E.b;
 {% endprettify %}
 
 If you need to use a constructor invocation, then use a factory
@@ -8905,6 +9572,39 @@ match the callback:
 {% prettify dart tag=pre+code %}
 void f(Future<String> future, String Function(dynamic, StackTrace) callback) {
   future.catchError(callback);
+}
+{% endprettify %}
+
+### invalid_sealed_annotation
+
+_The annotation '@sealed' can only be applied to classes._
+
+#### Description
+
+The analyzer produces this diagnostic when a declaration other than a
+class declaration has the `@sealed` annotation on it.
+
+#### Example
+
+The following code produces this diagnostic because the `@sealed`
+annotation is on a method declaration:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+class A {
+  [!@sealed!]
+  void m() {}
+}
+{% endprettify %}
+
+#### Common fixes
+
+Remove the annotation:
+
+{% prettify dart tag=pre+code %}
+class A {
+  void m() {}
 }
 {% endprettify %}
 
@@ -9211,6 +9911,61 @@ class B extends A {
 
 Remove the invalid use of the member.
 
+### invalid_use_of_visible_for_testing_member
+
+_The member '{0}' can only be used within '{1}' or a test._
+
+#### Description
+
+The analyzer produces this diagnostic when a member annotated with
+`@visibleForTesting` is referenced anywhere other than the library in
+which it is declared or in a library in the `test` directory.
+
+#### Example
+
+Given a file named `c.dart` that contains the following:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+class C {
+  @visibleForTesting
+  void m() {}
+}
+{% endprettify %}
+
+The following code, when not inside the `test` directory, produces this
+diagnostic because the method `m` is marked as being visible only for
+tests:
+
+{% prettify dart tag=pre+code %}
+import 'c.dart';
+
+void f(C c) {
+  c.[!m!]();
+}
+{% endprettify %}
+
+#### Common fixes
+
+If the annotated member should not be referenced outside of tests, then
+remove the reference:
+
+{% prettify dart tag=pre+code %}
+import 'c.dart';
+
+void f(C c) {}
+{% endprettify %}
+
+If it's OK to reference the annotated member outside of tests, then remove
+the annotation:
+
+{% prettify dart tag=pre+code %}
+class C {
+  void m() {}
+}
+{% endprettify %}
+
 ### invalid_visibility_annotation
 
 _The member '{0}' is annotated with '{1}', but this annotation is only
@@ -9489,7 +10244,9 @@ defined anywhere:
 void f() {
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 10; j++) {
-      break [!loop!];
+      if (j != 0) {
+        break [!loop!];
+      }
     }
   }
 }
@@ -9504,7 +10261,9 @@ If the label should be on the innermost enclosing `do`, `for`, `switch`, or
 void f() {
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 10; j++) {
-      break;
+      if (j != 0) {
+        break;
+      }
     }
   }
 }
@@ -9516,7 +10275,9 @@ If the label should be on some other statement, then add the label:
 void f() {
   loop: for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 10; j++) {
-      break loop;
+      if (j != 0) {
+        break loop;
+      }
     }
   }
 }
@@ -9638,7 +10399,7 @@ the annotation is a function type whose return type is `Handle`.
 In all of these cases, leaf calls are only supported for the types `bool`,
 `int`, `float`, `double`, and, as a return type `void`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -9687,7 +10448,7 @@ argument in an invocation of either `Pointer.asFunction` or
 `DynamicLibrary.lookupFunction` is `true` and the function that would be
 returned would have a parameter of type `Handle`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -10014,7 +10775,7 @@ _The annotation doesn't match the declared type of the field._
 The analyzer produces this diagnostic when the annotation on a field in a
 subclass of `Struct` or `Union` doesn't match the Dart type of the field.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -10056,8 +10817,8 @@ class C extends Struct {
 
 ### missing_annotation_on_struct_field
 
-_Fields in a struct class must either have the type 'Pointer' or an annotation
-indicating the native type._
+_Fields of type '{0}' in a subclass of '{1}' must have an annotation indicating
+the native type._
 
 #### Description
 
@@ -10067,7 +10828,7 @@ The Dart types `int`, `double`, and `Array` are used to represent multiple
 C types, and the annotation specifies which of the compatible C types the
 field represents.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -10102,7 +10863,7 @@ _Required library '{0}' is missing._
 #### Description
 
 The analyzer produces this diagnostic when either the Dart or Flutter SDK
-isn’t installed correctly, and, as a result, one of the `dart:` libraries
+isn't installed correctly, and, as a result, one of the `dart:` libraries
 can't be found.
 
 #### Common fixes
@@ -10238,7 +10999,7 @@ The analyzer produces this diagnostic when an invocation of the method
 return value) when the type to be returned from the invocation is neither
 `void`, `Handle`, nor `Pointer`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -10282,7 +11043,7 @@ The analyzer produces this diagnostic when a field in a subclass of
 an explicit type, and the type must either be `int`, `double`, `Pointer`,
 or a subclass of either `Struct` or `Union`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -10344,6 +11105,66 @@ name: example
 dependencies:
   meta: ^1.0.2
 ```
+
+### missing_override_of_must_be_overridden
+
+_Missing concrete override implementation of '{0}' and '{1}'._
+
+_Missing concrete override implementation of '{0}', '{1}', and {2} more._
+
+_Missing concrete override implementation of '{0}'._
+
+#### Description
+
+The analyzer produces this diagnostic when an instance member that has the
+`@mustBeOverridden` annotation isn't overridden in a subclass.
+
+#### Example
+
+The following code produces this diagnostic because the class `B` doesn't
+have an override of the inherited method `A.m` when `A.m` is annotated
+with `@mustBeOverridden`:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+class A {
+  @mustBeOverridden
+  void m() {}
+}
+
+class [!B!] extends A {}
+{% endprettify %}
+
+#### Common fixes
+
+If the annotation is appropriate for the member, then override the member
+in the subclass:
+
+{% prettify dart tag=pre+code %}
+import 'package:meta/meta.dart';
+
+class A {
+  @mustBeOverridden
+  void m() {}
+}
+
+class B extends A {
+  @override
+  void m() {}
+}
+{% endprettify %}
+
+If the annotation isn't appropriate for the member, then remove the
+annotation:
+
+{% prettify dart tag=pre+code %}
+class A {
+  void m() {}
+}
+
+class B extends A {}
+{% endprettify %}
 
 ### missing_required_argument
 
@@ -10457,7 +11278,7 @@ The analyzer produces this diagnostic when a field in a subclass of either
 `Struct` or `Union` has a type of `Array` but doesn't have a single
 `Array` annotation indicating the dimensions of the array.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -10903,6 +11724,44 @@ If the classes that use the mixin don't need to be subclasses of the sealed
 class, then consider adding a field and delegating to the wrapped instance
 of the sealed class.
 
+### mixin_super_class_constraint_deferred_class
+
+_Deferred classes can't be used as superclass constraints._
+
+#### Description
+
+The analyzer produces this diagnostic when a superclass constraint of a
+mixin is imported from a deferred library.
+
+#### Example
+
+The following code produces this diagnostic because the superclass
+constraint of `math.Random` is imported from a deferred library:
+
+{% prettify dart tag=pre+code %}
+import 'dart:async' deferred as async;
+
+mixin M<T> on [!async.Stream<T>!] {}
+{% endprettify %}
+
+#### Common fixes
+
+If the import doesn't need to be deferred, then remove the `deferred`
+keyword:
+
+{% prettify dart tag=pre+code %}
+import 'dart:async' as async;
+
+mixin M<T> on async.Stream<T> {}
+{% endprettify %}
+
+If the import does need to be deferred, then remove the superclass
+constraint:
+
+{% prettify dart tag=pre+code %}
+mixin M<T> {}
+{% endprettify %}
+
 ### mixin_super_class_constraint_non_interface
 
 _Only classes and mixins can be used as superclass constraints._
@@ -10978,7 +11837,7 @@ which can either be explicit or implicit.
 #### Example
 
 The following code produces this diagnostic because the initializer list
-for `B`’s constructor invokes both the constructor `one` and the
+for `B`'s constructor invokes both the constructor `one` and the
 constructor `two` from the superclass `A`:
 
 {% prettify dart tag=pre+code %}
@@ -11060,7 +11919,7 @@ The analyzer produces this diagnostic when an invocation of either
 `Pointer.fromFunction` or `DynamicLibrary.lookupFunction` has a type
 argument(whether explicit or inferred) that isn't a native function type.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -11109,7 +11968,7 @@ The analyzer produces this diagnostic in two cases:
 - In an invocation of `DynamicLibrary.lookupFunction` where the first type
   argument isn't a supertype of the second type argument.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -11299,7 +12158,7 @@ _The class '{0}' doesn't have an unnamed constructor._
 #### Description
 
 The analyzer produces this diagnostic when an unnamed constructor is
-invoked on a class that defines named constructors but the class doesn’t
+invoked on a class that defines named constructors but the class doesn't
 have an unnamed constructor.
 
 #### Example
@@ -11642,7 +12501,7 @@ import 'a.dart' deferred as a;
 
 void f(int x) {
   switch (x) {
-    case [!a.zero!]:
+    case a.[!zero!]:
       // ...
       break;
   }
@@ -11763,7 +12622,7 @@ library imported using a deferred import:
 {% prettify dart tag=pre+code %}
 import 'a.dart' deferred as a;
 
-void f({int x = [!a.zero!]}) {}
+void f({int x = a.[!zero!]}) {}
 {% endprettify %}
 
 #### Common fixes
@@ -11990,7 +12849,7 @@ The analyzer produces this diagnostic when the type arguments to a method
 are required to be known at compile time, but a type parameter, whose
 value can't be known at compile time, is used as a type argument.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -12271,7 +13130,7 @@ The analyzer produces this diagnostic when the method `asFunction` is
 invoked on a pointer to a native function, but the signature of the native
 function isn't a valid C function signature.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -12318,7 +13177,7 @@ _Array dimensions must be positive numbers._
 The analyzer produces this diagnostic when a dimension given in an `Array`
 annotation is less than or equal to zero (`0`).
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -12359,7 +13218,7 @@ The analyzer produces this diagnostic when the type argument for the class
 `Double`, `Pointer`, or subtype of `Struct`, `Union`, or
 `AbiSpecificInteger`.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -12441,7 +13300,7 @@ class C {
 
 ### non_type_as_type_argument
 
-_The name '{0}' isn't a type so it can't be used as a type argument._
+_The name '{0}' isn't a type, so it can't be used as a type argument._
 
 #### Description
 
@@ -12632,7 +13491,7 @@ String f() {
 }
 {% endprettify %}
 
-If `null` isn’t a valid value, and there's a reasonable default value, then
+If `null` isn't a valid value, and there's a reasonable default value, then
 add an initializer:
 
 {% prettify dart tag=pre+code %}
@@ -12729,7 +13588,13 @@ var a = 5 - 3;
 
 ### not_enough_positional_arguments
 
-_{0} positional argument(s) expected, but {1} found._
+_1 positional argument expected by '{0}', but 0 found._
+
+_1 positional argument expected, but 0 found._
+
+_{0} positional arguments expected by '{2}', but {1} found._
+
+_{0} positional arguments expected, but {1} found._
 
 #### Description
 
@@ -12745,7 +13610,7 @@ required parameters, but only one argument is provided:
 {% prettify dart tag=pre+code %}
 void f(int a, int b) {}
 void g() {
-  f[!(0)!];
+  f(0[!)!];
 }
 {% endprettify %}
 
@@ -12800,7 +13665,7 @@ class C {
 
 #### Common fixes
 
-If there's a reasonable default value for the field that’s the same for all
+If there's a reasonable default value for the field that's the same for all
 instances, then add an initializer expression:
 
 {% prettify dart tag=pre+code %}
@@ -13365,6 +14230,34 @@ void f() {
 Null g() => null;
 {% endprettify %}
 
+### obsolete_colon_for_default_value
+
+_Using a colon as a separator before a default value is no longer supported._
+
+#### Description
+
+The analyzer produces this diagnostic when a colon is used as the
+separator before the default value of an optional parameter. While this
+syntax used to be allowed, it's deprecated in favor of using an equal
+sign.
+
+#### Example
+
+The following code produces this diagnostic because a colon is being used
+before the default value of the optional parameter `i`:
+
+{% prettify dart tag=pre+code %}
+void f({int i [!:!] 0}) {}
+{% endprettify %}
+
+#### Common fixes
+
+Replace the colon with an equal sign:
+
+{% prettify dart tag=pre+code %}
+void f({int i = 0}) {}
+{% endprettify %}
+
 ### on_repeated
 
 _The type '{0}' can be included in the superclass constraints only once._
@@ -13453,7 +14346,7 @@ _The setter doesn't override an inherited setter._
 #### Description
 
 The analyzer produces this diagnostic when a class member is annotated with
-the `@override` annotation, but the member isn’t declared in any of the
+the `@override` annotation, but the member isn't declared in any of the
 supertypes of the class.
 
 #### Example
@@ -13494,7 +14387,7 @@ _Structs must have at most one 'Packed' annotation._
 The analyzer produces this diagnostic when a subclass of `Struct` has more
 than one `Packed` annotation.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -13533,7 +14426,7 @@ _Only packing to 1, 2, 4, 8, and 16 bytes is supported._
 The analyzer produces this diagnostic when the argument to the `Packed`
 annotation isn't one of the allowed values: 1, 2, 4, 8, or 16.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -13561,88 +14454,6 @@ class C extends Struct {
   external Pointer<Uint8> notEmpty;
 }
 {% endprettify %}
-
-### packed_nesting_non_packed
-
-_Nesting the non-packed or less tightly packed struct '{0}' in a packed struct
-'{1}' isn't supported._
-
-#### Description
-
-The analyzer produces this diagnostic when a subclass of `Struct` that is
-annotated as being `Packed` declares a field whose type is also a subclass
-of `Struct` and the field's type is either not packed or is packed less
-tightly.
-
-For more information about FFI, see [C interop using dart:ffi][].
-
-#### Example
-
-The following code produces this diagnostic because the class `Outer`,
-which is a subclass of `Struct` and is packed on 1-byte boundaries,
-declared a field whose type (`Inner`) is packed on 8-byte boundaries:
-
-{% prettify dart tag=pre+code %}
-import 'dart:ffi';
-
-@Packed(8)
-class Inner extends Struct {
-  external Pointer<Uint8> notEmpty;
-}
-
-@Packed(1)
-class Outer extends Struct {
-  external Pointer<Uint8> notEmpty;
-
-  external [!Inner!] nestedLooselyPacked;
-}
-{% endprettify %}
-
-#### Common fixes
-
-If the inner struct should be packed more tightly, then change the
-argument to the inner struct's `Packed` annotation:
-
-{% prettify dart tag=pre+code %}
-import 'dart:ffi';
-
-@Packed(1)
-class Inner extends Struct {
-  external Pointer<Uint8> notEmpty;
-}
-
-@Packed(1)
-class Outer extends Struct {
-  external Pointer<Uint8> notEmpty;
-
-  external Inner nestedLooselyPacked;
-}
-{% endprettify %}
-
-If the outer struct should be packed less tightly, then change the
-argument to the outer struct's `Packed` annotation:
-
-{% prettify dart tag=pre+code %}
-import 'dart:ffi';
-
-@Packed(8)
-class Inner extends Struct {
-  external Pointer<Uint8> notEmpty;
-}
-
-@Packed(8)
-class Outer extends Struct {
-  external Pointer<Uint8> notEmpty;
-
-  external Inner nestedLooselyPacked;
-}
-{% endprettify %}
-
-If the inner struct doesn't have an annotation and should be packed, then
-add an annotation.
-
-If the inner struct doesn't have an annotation and the outer struct
-shouldn't be packed, then remove its annotation.
 
 ### part_of_different_library
 
@@ -14748,7 +15559,7 @@ parameter._
 
 The analyzer produces this diagnostic when a redirecting factory
 constructor redirects to a type alias, and the type alias expands to one of
-the type parameters of the type alias. This isn’t allowed because the value
+the type parameters of the type alias. This isn't allowed because the value
 of the type parameter is a type rather than a class.
 
 #### Example
@@ -14787,7 +15598,7 @@ _Local variable '{0}' can't be referenced before it is declared._
 #### Description
 
 The analyzer produces this diagnostic when a variable is referenced before
-it’s declared. In Dart, variables are visible everywhere in the block in
+it's declared. In Dart, variables are visible everywhere in the block in
 which they are declared, but can only be referenced after they are
 declared.
 
@@ -15839,7 +16650,7 @@ The analyzer produces this diagnostic when the number of dimensions
 specified in an `Array` annotation doesn't match the number of nested
 arrays specified by the type of a field.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -15983,7 +16794,7 @@ class B extends a.A {}
 
 ### subtype_of_disallowed_type
 
-_''{0}' can't be used as a superclass constraint._
+_'{0}' can't be used as a superclass constraint._
 
 _Classes and mixins can't implement '{0}'._
 
@@ -16059,7 +16870,7 @@ other than `Struct` or `Union`, or implements or mixes in any FFI class.
 `Struct` and `Union` are the only FFI classes that can be subtyped, and
 then only by extending them.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -16161,7 +16972,7 @@ The analyzer produces this diagnostic when a class extends, implements, or
 mixes in a class that extends either `Struct` or `Union`. Classes can only
 extend either `Struct` or `Union` directly.
 
-For more information about FFI, see [C interop using dart:ffi][].
+For more information about FFI, see [C interop using dart:ffi][ffi].
 
 #### Example
 
@@ -16568,7 +17379,7 @@ _Invalid context for 'super' invocation._
 #### Description
 
 The analyzer produces this diagnostic when the keyword `super` is used
-outside of a instance method.
+outside of an instance method.
 
 #### Example
 
@@ -17080,7 +17891,7 @@ class C<T> {
 }
 {% endprettify %}
 
-Note, however, that there isn’t a relationship between `T` and `S`, so this
+Note, however, that there isn't a relationship between `T` and `S`, so this
 second option changes the semantics from what was likely to be intended.
 
 ### type_parameter_supertype_of_its_bound
@@ -17310,7 +18121,7 @@ void f() {}
 
 #### Common fixes
 
-If the name is correct, but it isn’t declared yet, then declare the name as
+If the name is correct, but it isn't declared yet, then declare the name as
 a constant value:
 
 {% prettify dart tag=pre+code %}
@@ -18333,7 +19144,7 @@ _The setter '{0}' isn't defined in a superclass of '{1}'._
 #### Description
 
 The analyzer produces this diagnostic when an inherited member (method,
-getter, setter, or operator) is referenced using `super`, but there’s no
+getter, setter, or operator) is referenced using `super`, but there's no
 member with that name in the superclass chain.
 
 #### Examples
@@ -18368,7 +19179,7 @@ make the name of the invoked member match the inherited member.
 If the member you intend to invoke is defined in the same class, then
 remove the `super.`.
 
-If the member isn’t defined, then either add the member to one of the
+If the member isn't defined, then either add the member to one of the
 superclasses or remove the invocation.
 
 ### unnecessary_cast
@@ -18440,6 +19251,58 @@ name: example
 dependencies:
   meta: ^1.0.2
 ```
+
+### unnecessary_final
+
+_The keyword 'final' isn't necessary because the parameter is implicitly
+'final'._
+
+#### Description
+
+The analyzer produces this diagnostic when either a field initializing
+parameter or a super parameter in a constructor has the keyword `final`.
+In both cases the keyword is unnecessary because the parameter is
+implicitly `final`.
+
+#### Examples
+
+The following code produces this diagnostic because the field initializing
+parameter has the keyword `final`:
+
+{% prettify dart tag=pre+code %}
+class A {
+  int value;
+
+  A([!final!] this.value);
+}
+{% endprettify %}
+
+The following code produces this diagnostic because the super parameter in
+`B` has the keyword `final`:
+
+{% prettify dart tag=pre+code %}
+class A {
+  A(int value);
+}
+
+class B extends A {
+  B([!final!] super.value);
+}
+{% endprettify %}
+
+#### Common fixes
+
+Remove the unnecessary `final` keyword:
+
+{% prettify dart tag=pre+code %}
+class A {
+  A(int value);
+}
+
+class B extends A {
+  B(super.value);
+}
+{% endprettify %}
 
 ### unnecessary_import
 
@@ -18877,11 +19740,19 @@ _The declaration '{0}' isn't referenced._
 The analyzer produces this diagnostic when a private declaration isn't
 referenced in the library that contains the declaration. The following
 kinds of declarations are analyzed:
-- Private top-level declarations, such as classes, enums, mixins, typedefs,
-  top-level variables, and top-level functions
-- Private static and instance methods
+- Private top-level declarations and all of their members
+- Private members of public declarations
 - Optional parameters of private functions for which a value is never
-  passed, even when the parameter doesn't have a private name
+  passed
+
+Not all references to an element will mark it as "used":
+- Assigning a value to a top-level variable (with a standard `=`
+  assignment, or a null-aware `??=` assignment) does not count as using
+  it.
+- Referring to an element in a doc comment reference does not count as
+  using it.
+- Referring to a class, mixin, or enum on the right side of an `is`
+  expression does not count as using it.
 
 #### Example
 
@@ -19020,7 +19891,9 @@ If the label is needed, then use it:
 void f(int limit) {
   loop: for (int i = 0; i < limit; i++) {
     print(i);
-    break loop;
+    if (i != 0) {
+      break loop;
+    }
   }
 }
 {% endprettify %}
@@ -19126,7 +19999,7 @@ void f(C c) {
 
 ### unused_shown_name
 
-_The name {0} is shown, but isn’t used._
+_The name {0} is shown, but isn't used._
 
 #### Description
 
@@ -19222,7 +20095,7 @@ _URIs can't use string interpolation._
 The analyzer produces this diagnostic when the string literal in an
 `import`, `export`, or `part` directive contains an interpolation. The
 resolution of the URIs in directives must happen before the declarations
-are compiled, so expressions can’t be  evaluated  while determining the
+are compiled, so expressions can't be  evaluated  while determining the
 values of the URIs.
 
 #### Example
@@ -19248,7 +20121,7 @@ var zero = min(0, 0);
 
 ### use_of_native_extension
 
-_Dart native extensions are deprecated and aren’t available in Dart 2.15._
+_Dart native extensions are deprecated and aren't available in Dart 2.15._
 
 #### Description
 

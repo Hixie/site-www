@@ -9,7 +9,7 @@ prevpage:
   title: "Get started: Command-line and server apps"
 ---
 
-{% assign _api = site.dart_api | append: '/' | append: site.data.pkg-vers.SDK.channel -%}
+{% assign _api = site.dart-api | append: '/' | append: site.data.pkg-vers.SDK.channel -%}
 {% assign argsAPI = site.pub-api | append: '/args/latest/args' -%}
 {% assign ioAPI = _api | append: '/dart-io' -%}
 
@@ -150,7 +150,7 @@ $ dart run bin/dcat.dart -n pubspec.yaml
 11 #   path: ^1.8.0
 12
 13 dev_dependencies:
-14   lints: ^1.0.0
+14   lints: ^2.0.0
 15 dependencies:
 16   args: ^2.3.0
 ```
@@ -571,7 +571,7 @@ In addition, this tutorial covers two classes that help with command-line argume
 For more classes, functions, and properties,
 consult to the API reference for
 [dart:io,]({{ioAPI}}/dart-io-library.html)
-[dart:convert,]({{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/dart-convert-library.html)
+[dart:convert,]({{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/dart-convert-library.html)
 and the [args]({{argsAPI}}/args-library.html) package.  
 
 For another example of a command line app, 

@@ -90,7 +90,9 @@ Using a verified publisher has the following advantages:
 * The consumers of your package know that the publisher domain has been verified.
 * You can avoid having pub.dev display your personal email address.
   Instead, pub.dev displays the publisher domain and contact address.
-* A verified publisher badge <img src="/assets/img/verified-publisher.svg" alt="pub.dev verified publisher logo"> is displayed next to your package name on both search pages and individual package pages.
+* The pub.dev site displays a verified publisher badge 
+  <img src="/assets/img/verified-publisher.svg" width="20" height="20" alt="pub.dev verified publisher logo">
+  next to your package name on search pages and individual package pages.
 
 
 ### Creating a verified publisher {#create-verified-publisher}
@@ -208,8 +210,8 @@ Here's how to transfer a package to a verified publisher:
 included in the published package,
 with the following exceptions:
 
- * Any _hidden_ files or directories —
-   that is, files with names that begin with dot (`.`)
+ * Any _hidden_ files or directories—that is, 
+   files with names that begin with dot (`.`)
  * Any directories with the name `packages`
  * Files and directories ignored by a `.pubignore` or `.gitignore` file
 
@@ -253,16 +255,23 @@ To change the automatically generated list of supported platforms,
 
 Whoever publishes the first version of a package automatically becomes
 the first and only person authorized to upload additional versions of that package.
-To allow or disallow other people to upload versions,
-transfer the package to a [verified publisher][] or
-manage authorized uploaders on the admin page for the package:
-`https://pub.dev/packages/<package>/admin`.
+
+To allow or disallow other people to upload versions, either:
+
+* Manage authorized uploaders on the admin page for the package:
+  `https://pub.dev/packages/<package>/admin`.
+
+* Transfer the package to a [verified publisher][];
+  all members of a publisher are authorized to upload.
+
+## Locating the package publisher
 
 If a package has a verified publisher,
 then the pub.dev page for that package displays the publisher domain.
-Otherwise, the page displays the email addresses of
-the authorized uploaders for the package.
 
+For packages published without a publisher,
+the publisher is not disclosed for privacy reasons
+(the Publisher field just says "unverified uploader").
 
 ## Publishing prereleases
 
@@ -414,7 +423,7 @@ where you can mark the package as discontinued.
 If you change your mind, you can remove the discontinued mark at any time.
 
 
-[Create a verified publisher]: https://pub.dev/create-publisher
+[Create a verified publisher]: {{site.pub}}/create-publisher
 [BSD 3-clause license]: https://opensource.org/licenses/BSD-3-Clause
 [Google Account]: https://support.google.com/accounts/answer/27441
 [Markdown]: {{site.pub-pkg}}/markdown

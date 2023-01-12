@@ -45,6 +45,13 @@
           permalink: /guides/language/effective-dart/usage
         - title: Design
           permalink: /guides/language/effective-dart/design
+    - title: Coming from ...
+      expanded: false
+      children:
+        - title: JavaScript to Dart
+          permalink: /guides/language/coming-from/js-to-dart
+        - title: Swift to Dart
+          permalink: /guides/language/coming-from/swift-to-dart
     - title: Extension methods
       permalink: /guides/language/extension-methods
     - title: Concurrency
@@ -91,8 +98,6 @@
       permalink: /guides/libraries/library-tour
     - title: Articles
       children:
-        - title: Intro to dart:io
-          permalink: /articles/libraries/dart-io
         - title: Creating streams
           permalink: /articles/libraries/creating-streams
 
@@ -142,6 +147,8 @@
       children:
         - title: C interop
           permalink: /guides/libraries/c-interop
+        - title: Objective-C and Swift interop
+          permalink: /guides/libraries/objective-c-interop
         - title: JavaScript interop
           permalink: /web/js-interop
     - title: Google APIs
@@ -287,10 +294,6 @@
           urlExactMatch: true
           match-page-url-exactly: true
           permalink: /dart-2
-        - title: Migrating web apps to Dart&nbsp;2
-          permalink: /web/dart-2
-        - title: Obsolete pub features
-          permalink: /tools/pub/obsolete
     - title: Videos
       permalink: /resources/videos
 

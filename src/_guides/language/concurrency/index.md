@@ -23,27 +23,15 @@ Each Dart isolate has a single thread of execution and
 shares no mutable objects with other isolates.
 To communicate with each other,
 isolates use message passing.
+Many Dart apps use only one isolate, the _main isolate_.
+You can create additional isolates to enable
+parallel code execution on multiple processor cores.
+
 Although Dart's isolate model is built with underlying primitives
 such as processes and threads
 that the operating system provides,
 the Dart VM's use of these primitives
 is an implementation detail that this page doesn't discuss.
-
-Many Dart apps use only one isolate (the _main isolate_),
-but you can create additional isolates,
-enabling parallel code execution on multiple processor cores.
-
-{{site.alert.info}}
-  **Platform note:**
-  All apps can use async-await, `Future`, and `Stream`.
-  Isolates are implemented only on the [Dart Native platform][];
-  Dart web apps can use [web workers][] for similar functionality.
-{{site.alert.end}}
-
-[Dart Native platform]: /overview#platform
-[web workers]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers
-
-
 
 ## Asynchrony types and syntax
 
@@ -73,15 +61,33 @@ immediately returns an object of type `Future<String>`.
 At some point in the future,
 the `Future<String>` completes with either a string value or an error.
 
-[`readAsStringSync()`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-io/File/readAsStringSync.html
-[`readAsString()`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-io/File/readAsString.html
+[`readAsStringSync()`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-io/File/readAsStringSync.html
+[`readAsString()`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-io/File/readAsString.html
 
-Why does it matter whether a method is synchronous or asynchronous?
-It matters because most apps need to do more than one thing at a time.
+
+#### Why asynchronous code matters
+
+It matters whether a method is synchronous or asynchronous
+because most apps need to do more than one thing at a time.
+
+Asynchronous computations are often the result of performing computations
+outside of the current Dart code; 
+this includes computations that don't complete immediately, 
+and where you aren't willing to block your Dart code waiting for the result.
 For example, an app might start an HTTP request,
 but need to update its display or respond to user input
 before the HTTP request completes.
 Asynchronous code helps apps stay responsive.
+
+These scenarios include operating system calls like
+non-blocking I/O, performing an HTTP request, or communicating with a browser. 
+Other scenarios include waiting for computations
+performed in another Dart isolate as described below, 
+or maybe just waiting for a timer to trigger. 
+All of these processes either run in a different thread, 
+or are handled by the operating system or the Dart runtime, 
+which allows Dart code to run concurrently with the computation.
+
 
 ### The async-await syntax
 
@@ -89,7 +95,8 @@ The `async` and `await` keywords provide
 a declarative way to define asynchronous functions
 and use their results.
 
-Here’s an example of some synchronous code that blocks while waiting for file I/O:
+Here’s an example of some synchronous code
+that blocks while waiting for file I/O:
 
 <?code-excerpt "lib/sync_number_of_keys.dart"?>
 ```dart
@@ -175,6 +182,14 @@ using additional processor cores if they’re available.
 Isolates are like threads or processes,
 but each isolate has its own memory and a single thread running an event loop.
 
+{{site.alert.info}}
+  **Platform note:**
+    Only the [Dart Native platform][] implements isolates.
+    To learn more about the Dart Web platform,
+    see the [Concurrency on the web](#concurrency-on-the-web) section.
+{{site.alert.end}}
+
+[Dart Native platform]: /overview#platform
 
 ### The main isolate
 
@@ -198,8 +213,8 @@ using asynchronous operations as necessary.
 As the following figure shows,
 every isolate starts by running some Dart code,
 such as the `main()` function.
-This Dart code might register some event listeners —
-to respond to user input or file I/O, for example.
+This Dart code might register some event listeners—to 
+respond to user input or file I/O, for example.
 When the isolate's initial function returns,
 the isolate stays around if it needs to handle events.
 After handling the events, the isolate exits.
@@ -238,21 +253,21 @@ In client apps, the result of a too-lengthy synchronous operation is often
 [janky (non-smooth) UI animation][jank].
 Worse, the UI might become completely unresponsive.
 
-[jank]: {{site.flutter_docs}}/perf/rendering
+[jank]: {{site.flutter-docs}}/perf/rendering-performance
 
 
 ### Background workers
 
-If your app’s UI becomes unresponsive due to a time-consuming computation —
-[parsing a large JSON file][json], for example —
-consider offloading that computation to a worker isolate,
+If your app’s UI becomes unresponsive due to 
+a time-consuming computation—[parsing a large JSON file][json], 
+for example—consider offloading that computation to a worker isolate,
 often called a _background worker._
 A common case, shown in the following figure,
 is spawning a simple worker isolate that
 performs a computation and then exits.
 The worker isolate returns its result in a message when the worker exits.
 
-[json]: {{site.flutter_docs}}/cookbook/networking/background-parsing
+[json]: {{site.flutter-docs}}/cookbook/networking/background-parsing
 
 ![A figure showing a main isolate and a simple worker isolate](/guides/language/concurrency/images/isolate-bg-worker.png)
 
@@ -274,7 +289,7 @@ It has its own memory and
 doesn’t share any state with the main isolate.
 The worker isolate can block without affecting other isolates.
 
-[`send()` method]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/SendPort/send.html
+[`send()` method]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/SendPort/send.html
 
 
 ## Code examples
@@ -283,8 +298,7 @@ This section discusses some examples
 that use the `Isolate` API
 to implement isolates.
 
-{{site.alert.info}}
-  **Flutter note:**
+{{site.alert.flutter-note}}
   If you're using Flutter on a non-web platform,
   then instead of using the `Isolate` API directly,
   consider using the [Flutter `compute()` function][].
@@ -292,7 +306,7 @@ to implement isolates.
   move a single function call to a worker isolate.
 {{site.alert.end}}
 
- [Flutter `compute()` function]: {{site.flutter_docs}}/cookbook/networking/background-parsing#4-move-this-work-to-a-separate-isolate
+ [Flutter `compute()` function]: {{site.flutter-docs}}/cookbook/networking/background-parsing#4-move-this-work-to-a-separate-isolate
 
 
 ### Implementing a simple worker isolate
@@ -308,10 +322,10 @@ This example uses the following isolate-related API:
 * [`Isolate.spawn()`][] and [`Isolate.exit()`][]
 * [`ReceivePort`][] and [`SendPort`][]
 
-[`Isolate.exit()`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/Isolate/exit.html
-[`Isolate.spawn()`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/Isolate/spawn.html
-[`ReceivePort`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/ReceivePort-class.html
-[`SendPort`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/SendPort-class.html
+[`Isolate.exit()`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/Isolate/exit.html
+[`Isolate.spawn()`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/Isolate/spawn.html
+[`ReceivePort`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/ReceivePort-class.html
+[`SendPort`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/SendPort-class.html
 
 Here’s the code for the main isolate:
 
@@ -355,7 +369,7 @@ and then returns the result:
    the [`first`][] property is an easy way to get
    the single message that the worker isolate sends.
 
-[`first`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Stream/first.html
+[`first`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Stream/first.html
 
 The spawned isolate executes the following code:
 
@@ -370,15 +384,14 @@ Future<void> _readAndParseJson(SendPort p) async {
 
 The relevant statement is the last one, which exits the isolate,
 sending `jsonData` to the passed-in `SendPort`.
-Message passing between isolates normally involves data copying,
-and thus can be slow and increases with the size of the message —
-O(n) in [big O notation][].
+Message passing using `SendPort.send` normally involves data copying,
+and thus can be slow.
 However, when you send the data using `Isolate.exit()`,
 then the memory that holds the message in the exiting isolate isn’t copied,
 but instead is transferred to the receiving isolate.
-That transfer is quick and completes in constant time — O(1).
+The sender will nonetheless perform a verification pass to ensure
+the objects are allowed to be transferred.
 
-[big O notation]: https://en.wikipedia.org/wiki/Big_O_notation
 
 {{site.alert.version-note}}
   `Isolate.exit()` was added in 2.15.
@@ -439,21 +452,40 @@ and the new isolate isn't in its spawner's isolate group.
 Another performance consequence is that message passing
 is slower when isolates are in different groups.
 
-[`Isolate.spawnUri()`]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/Isolate/spawnUri.html
+[`Isolate.spawnUri()`]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-isolate/Isolate/spawnUri.html
 
-{{ site.alert.info }}
-  **Flutter note:**
+{{site.alert.flutter-note}}
   Flutter doesn't support `Isolate.spawnUri()`.
-{{ site.alert.end }}
+{{site.alert.end}}
 
-{% comment %}
-TODO:
-* After publishing:
-  * Figure out how to save an editable version of the source that has the right fonts. (The SVG files don't like the custom fonts; otherwise, I would've used SVGs instead of PNGs.)
-* Maybe:
-  * Add a new macro & style for flutter notes?
-  * Add the following text somewhere in this page (or in the FAQ):
-    * Sometimes Dart is called a _single-threaded language._
-    * Dart code executes in a predictable sequence that can’t be interrupted by other Dart code.
-  * Add a figure up high in the doc? (if so, what?)
-{% endcomment %}
+## Concurrency on the web
+
+All Dart apps can use `async-await`, `Future`, and `Stream`
+for non-blocking, interleaved computations.
+The [Dart web platform][], however, does not support isolates.
+Dart web apps can use [web workers][] to
+run scripts in background threads
+similar to isolates.
+Web workers' functionality and capabilities
+differ somewhat from isolates, though.
+
+For instance, when web workers send data between threads,
+they copy the data back and forth.
+Data copying can be very slow, though,
+especially for large messages. 
+Isolates do the same, but also provide APIs
+that can more efficiently _transfer_
+the memory that holds the message instead.
+
+Creating web workers and isolates also differs.
+You can only create web workers by declaring
+a separate program entrypoint and compiling it separately.
+Starting a web worker is similar to using `Isolate.spawnUri` to start an isolate.
+You can also start an isolate with `Isolate.spawn`,
+which requires fewer resources because it
+[reuses some of the same code and data](#performance-and-isolate-groups)
+as the spawning isolate. 
+Web workers don't have an equivalent API.
+
+[Dart web platform]: /overview#platform
+[web workers]: https://developer.mozilla.org/docs/Web/API/Web_Workers_API/Using_web_workers

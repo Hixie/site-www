@@ -3,12 +3,23 @@ title: Unsound null safety
 description: Mixing language versions lets you migrate to null safety at your own pace, with some of the benefits of null safety.
 ---
 
-A Dart program can contain some libraries that
+A Dart program may contain some libraries that
 are [null safe][] and some that aren't.
 These **mixed-version programs**
-execute with **unsound null safety**.
+rely on **unsound null safety**.
+
+{{site.alert.warn}}
+Dart 3---planned for a mid-2023 release---will require sound null safety. 
+It will prevent code from running without
+null safety, or with unsound null safety.
+All existing code must be [migrated][] to sound null safety
+to be compatible with Dart 3.
+To learn more, see the [Dart 3 sound null safety tracking issue][].
+{{site.alert.end}}
 
 [null safe]: /null-safety
+[migrated]: /null-safety#migrate
+[Dart 3 sound null safety tracking issue]: https://github.com/dart-lang/sdk/issues/49530
 
 The ability to mix [language versions][]
 frees package maintainers to migrate their code,
@@ -77,8 +88,8 @@ Because Dart supports mixed-version programs,
 you can migrate one library (generally one Dart file) at a time,
 while still being able to run your program and its tests.
 
-We recommend that you **first migrate leaf libraries** —
-libraries that don't import other files from the package.
+We recommend that you **first migrate leaf libraries**—libraries 
+that don't import other files from the package.
 Then migrate libraries that directly depend on the leaf libraries.
 End by migrating the libraries that have the most
 intra-package dependencies.
@@ -116,10 +127,11 @@ If you want to incrementally migrate a package by hand, follow these steps:
 
 1. Edit the package's `pubspec.yaml` file,
    setting the minimum SDK constraint to `2.12.0`:
+
    ```yaml
-environment:
-  sdk: '>=2.12.0 <3.0.0'
-```
+   environment:
+     sdk: '>=2.12.0 <3.0.0'
+   ```
 
 2. Regenerate the [package configuration file][]:
 
@@ -127,7 +139,7 @@ environment:
    $ dart pub get
    ```
 
-   [package configuration file]: https://github.com/dart-lang/language/blob/master/accepted/future-releases/language-versioning/package-config-file-v2.md
+   [package configuration file]: https://github.com/dart-lang/language/blob/master/accepted/2.8/language-versioning/package-config-file-v2.md
 
    Running `dart pub get` with a lower SDK constraint of `2.12.0`
    sets the default language version of
@@ -140,9 +152,10 @@ environment:
 
 4. Add a [language version comment][] to the top of
    any Dart files that you don't want to consider during your current migration:
+   
    ```dart
-// @dart=2.9
-```
+   // @dart=2.9
+   ```
 
    Using language version 2.9 for a library that's in a 2.12 package
    can reduce analysis errors (red squiggles) coming from unmigrated code.
@@ -172,8 +185,8 @@ You can do this in two ways:
   $ flutter run --no-sound-null-safety
   ```
 
-* Alternatively, set the language version in the entrypoint —
-  the file that contains `main()` function — to 2.9.
+* Alternatively, set the language version in the 
+  entrypoint—the file that contains `main()` function—to 2.9.
   In Flutter apps, this file is often named `lib/main.dart`.
   In command-line apps, this file is often named `bin/<packageName>.dart`.
   You can also opt out files under `test`,
@@ -184,7 +197,7 @@ You can do this in two ways:
   // @dart=2.9
   import 'src/my_app.dart';
 
-  main() {
+  void main() {
     //...
   }
   ```

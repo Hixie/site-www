@@ -18,7 +18,7 @@ such as [Chrome DevTools][] to debug your Dart web apps.
 
 To serve your app, use `webdev serve`
 (either at the command line or through your IDE)
-to start up the Dart development compiler ([dartdevc][]).
+to start up the Dart development compiler.
 To enable Dart DevTools, add the `--debug` or `--debug-extension` option
 (at the command line or through your IDE):
 
@@ -35,7 +35,7 @@ To open Chrome DevTools, press <kbd>Control</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd>
 (or <kbd>Command</kbd>+<kbd>Option</kbd>+<kbd>I</kbd> on macOS).
 If you want to debug your app using Chrome DevTools,
 you can use [source maps][] to display your Dart source files
-instead of the JavaScript that [dartdevc][] produces.
+instead of the JavaScript that the compiler produces.
 For more information on using Chrome DevTools,
 see the [Chrome DevTools documentation.][Chrome DevTools]
 
@@ -55,11 +55,6 @@ to debug a Dart web app, you need the following software:
 * A [Dart web app][] to debug.
 
 [cl-tools]: #getting-command-line-tool-packages
-
-If you need to debug dart2js-produced code
-or can't use the Chrome browser to debug, see the tips in the
-[dart2js debugging section][dart2js-debug].
-
 
 ## Getting started with Dart DevTools {#using-dart-devtools}
 
@@ -85,13 +80,13 @@ but you'll need to adjust the instructions to match your app.
    $ dart pub get
    ```
 
-1. Compile and serve the app with dartdevc,
+1. Compile and serve the app in debug mode,
    using either your IDE or `webdev` at the command line.
 
    {{site.alert.note}}
-    The first dartdevc compilation takes the longest,
-    because the entire app must be compiled.
-    After that, refreshes are much faster.
+     The first compilation takes the longest,
+     because the entire app must be compiled.
+     After that, refreshes are much faster.
    {{site.alert.end}}
 
    If you're using webdev at the command line,
@@ -105,8 +100,9 @@ but you'll need to adjust the instructions to match your app.
      $ webdev serve --debug-extension
      ```
 
-   * Otherwise, use the following command, which launches a new instance of
-     Chrome and runs the app:
+   * Otherwise, use the following command, 
+     which launches a new instance of Chrome
+     and runs the app:
 
      ```terminal
      $ webdev serve --debug
@@ -167,12 +163,10 @@ but you'll need to adjust the instructions to match your app.
 
 If you're using the command line instead of an IDE or Dart-enabled editor,
 then you need the [webdev tool][webdev].
-To use Dart DevTools, you also need the [devtools package.][devtools-pkg]
-Use pub to get these tools:
+Dart DevTools is provided by the SDK.
 
 ```terminal
 $ dart pub global activate webdev
-$ dart pub global activate devtools
 ```
 
 If your PATH environment variable is set up correctly,
@@ -192,19 +186,18 @@ update the tools by activating them again:
 
 ```terminal
 $ dart pub global activate webdev     # update webdev
-$ dart pub global activate devtools   # update devtools
 ```
+
+{% include tools/debug-prod-js-code.md %}
 
 ## Resources
 
-For more information, see the following:
+To learn more, see the following:
 
 * Documentation for [your IDE][IDE]
 * [Dart DevTools documentation][Dart DevTools]
-* [dartdevc FAQ][]
 * [webdev tool documentation][webdev]
 * [webdev package documentation][webdev-pkg]
-* [Tips for debugging dart2js-produced code][dart2js-debug]
 
 [Chrome DevTools]: https://developer.chrome.com/docs/devtools/
 [Dart Debug Extension]: https://chrome.google.com/webstore/detail/dart-debug-extension/eljbmlghnomdjgdjmbdekegdkbabckhm
@@ -212,9 +205,6 @@ For more information, see the following:
 [IDE]: /tools#ides-and-editors
 [Dart SDK]: /get-dart
 [Dart web app]: /web
-[dart2js-debug]: /tools/dart2js#debugging
-[dartdevc]: /tools/dartdevc
-[dartdevc FAQ]: /tools/dartdevc/faq
 [Google Chrome]: https://www.google.com/chrome
 [issue 1925]: https://github.com/flutter/devtools/issues/1925
 [JavaScript debugging reference]: https://developer.chrome.com/docs/devtools/javascript/reference/

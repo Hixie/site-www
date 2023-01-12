@@ -23,7 +23,7 @@ returns a Future, which will eventually contain the result.
 The future will tell you when the result is ready.
 
 A stream is a sequence of asynchronous events.
-It is like an asynchronous Iterable&mdash;where, instead of getting
+It is like an asynchronous Iterable—where, instead of getting
 the next event when you ask for it, the stream tells you that
 there is an event when it is ready.
 
@@ -303,7 +303,7 @@ Stream<S> transform<S>(StreamTransformer<T, S> streamTransformer);
 
 The final three functions are more special.
 They involve error handling which an **await for** loop
-can't do&mdash;the first error reaching the loops will end
+can't do—the first error reaching the loops will end
 the loop and its subscription on the stream.
 There is no recovering from that.
 The following code shows how to use `handleError()` to remove errors
@@ -360,7 +360,7 @@ void main(List<String> args) async {
 ## The listen() method {#listen-method}
 
 The final method on Stream is `listen()`. This is a "low-level"
-method&mdash;all other stream functions are defined in terms of `listen()`.
+method—all other stream functions are defined in terms of `listen()`.
 
 <?code-excerpt "misc/lib/tutorial/stream_interface.dart (listen)"?>
 ```dart
@@ -369,7 +369,7 @@ StreamSubscription<T> listen(void Function(T event)? onData,
 ```
 
 To create a new `Stream` type, you can just extend the `Stream`
-class and implement the `listen()` method&mdash;all other methods
+class and implement the `listen()` method—all other methods
 on `Stream` call `listen()` in order to work.
 
 The `listen()` method allows you to start listening on a stream.
@@ -398,13 +398,13 @@ and asynchronous programming in Dart.
   an article that explains how to handle errors using the Future API
 * [Asynchrony support](/guides/language/language-tour#asynchrony-support),
   a section in the [language tour](/guides/language/language-tour)
-* [Stream API reference]({{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Stream-class.html)
+* [Stream API reference]({{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Stream-class.html)
 
-[bind()]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/StreamTransformer/bind.html
-[LineSplitter]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/LineSplitter-class.html
-[Future]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Future-class.html
-[Iterable]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterable-class.html
-[Stream]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Stream-class.html
-[StreamSubscription]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/StreamSubscription-class.html
-[StreamTransformer]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/StreamTransformer-class.html
-[Utf8Decoder]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/Utf8Decoder-class.html
+[bind()]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/StreamTransformer/bind.html
+[LineSplitter]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/LineSplitter-class.html
+[Future]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Future-class.html
+[Iterable]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-core/Iterable-class.html
+[Stream]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/Stream-class.html
+[StreamSubscription]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/StreamSubscription-class.html
+[StreamTransformer]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-async/StreamTransformer-class.html
+[Utf8Decoder]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/Utf8Decoder-class.html

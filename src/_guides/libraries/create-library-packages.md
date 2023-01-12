@@ -9,6 +9,17 @@ This page tells you how to create a package,
 with a focus on the most common kind of package,
 [_library_ packages](/tools/pub/glossary#library-package).
 
+
+## Creating a new package
+
+To create the initial directory and structure for a package,
+use the [`dart create`](/tools/dart-create) command
+and the `package` template:
+
+```terminal
+$ dart create -t package <PACKAGE_NAME>
+```
+
 {% comment %}
 TODO: Add coverage of packages that contain tools.
 {% endcomment %}
@@ -26,7 +37,7 @@ The minimal requirements for a library are:
 
 pubspec file
 : The `pubspec.yaml` file for a library is the same
-  as for an application package&mdash;there is no special
+  as for an application package—there is no special
   designation to indicate that the package is a library.
 
 lib directory
@@ -84,10 +95,11 @@ library packages:
   alt="shelf root directory contains example, lib, test, and tool subdirectories">
 
 Directly under lib, the main library file,
-`shelf.dart`, exports API from several files in lib/src.
-To avoid exposing more API than intended —
-and to give developers an overview of the entire public API of the package —
-`shelf.dart` uses `show` to specify exactly which symbols to export:
+`shelf.dart`, exports API from several files in `lib/src`.
+To avoid exposing more API than intended—and 
+to give developers an overview of the entire
+public API of the package—`shelf.dart` 
+uses `show` to specify exactly which symbols to export:
 
 ```dart
 export 'src/cascade.dart' show Cascade;

@@ -1,5 +1,5 @@
 // NOTE: Declarations in this file are analyzed but not tested.
-// ignore_for_file: unused_element, unused_local_variable, one_member_abstracts
+// ignore_for_file: unused_element, unused_local_variable, one_member_abstracts, use_super_parameters
 // ignore_for_file: prefer_function_declarations_over_variables, unused_field, strict_raw_type
 
 import 'dart:html';
@@ -130,4 +130,22 @@ void funcCast() {
   void filterValues(bool Function(dynamic) filter) {}
   filterValues((x) => (x as String).contains('Hello'));
   // #enddocregion func-cast
+}
+
+//-----------------------------------------------
+
+void infNull() {
+  // #docregion type-inf-null
+  List<int> ints = [1, 2, 3];
+  // ignore: non_bool_operand, undefined_operator
+  var maximumOrNull = ints.fold(null, (a, b) => a == null || a < b ? b : a);
+  // #enddocregion type-inf-null
+}
+
+void infFix() {
+  // #docregion type-inf-fix
+  List<int> ints = [1, 2, 3];
+  var maximumOrNull =
+      ints.fold<int?>(null, (a, b) => a == null || a < b ? b : a);
+  // #enddocregion type-inf-fix
 }

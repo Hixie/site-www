@@ -35,6 +35,14 @@ void miscDeclAnalyzedButNotTested() {
     // #docregion use-named-parameters
     enableFlags(bold: true, hidden: false);
     // #enddocregion use-named-parameters
+
+    void repeat(Function func, {int times = 1}) {}
+
+    // #docregion named-arguments-anywhere
+    repeat(times: 2, () {
+      /*...*/
+    });
+    // #enddocregion named-arguments-anywhere
   }
 
   {
@@ -45,21 +53,6 @@ void miscDeclAnalyzedButNotTested() {
     // bold will be true; hidden will be false.
     enableFlags(bold: true);
     // #enddocregion named-parameter-default-values
-  }
-
-  {
-    // #docregion list-map-default-function-param
-    void doStuff(
-        {List<int> list = const [1, 2, 3],
-        Map<String, String> gifts = const {
-          'first': 'paper',
-          'second': 'cotton',
-          'third': 'leather'
-        }}) {
-      print('list:  $list');
-      print('gifts: $gifts');
-    }
-    // #enddocregion list-map-default-function-param
   }
 
   {
@@ -84,7 +77,12 @@ abstract class Widget {
 
 class Scrollbar extends Widget {
   // #docregion required-named-parameters
-  const Scrollbar({Key? key, required Widget child})
-      // #enddocregion required-named-parameters
-      : super(key: key);
+  const Scrollbar({super.key, required Widget child});
+  // #enddocregion required-named-parameters
+}
+
+class ScrollbarTwo extends Widget {
+  // #docregion required-named-parameters-nullable
+  const ScrollbarTwo({super.key, required Widget? child});
+  // #enddocregion required-named-parameters-nullable
 }

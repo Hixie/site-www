@@ -73,7 +73,7 @@ literally on my first day of writing Dart code, I was productive in it."
 ### Q. Does Dart have reflection capabilities?
 
 For servers and command-line scripts, we have reflection support from the
-[mirrors API.]({{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-mirrors)
+[mirrors API.]({{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-mirrors)
 There is no support for mirrors when using Dart to write web or
 Flutter apps ([more info][Flutter no mirrors]).
 
@@ -110,14 +110,12 @@ Yes, Dart 2 is statically typed. For more information,
 read about [Dart's type system][].
 
 With its combination of static and runtime checks, Dart has a sound type system,
-which guarantees that an expression of one type cannot produce a value of
-another type. No surprises!
+which guarantees that an expression of one type cannot produce a value of another type.
+No surprises!
 
-Even with type-safe Dart, you can annotate any variable with
-`dynamic` if you need the flexibility of a dynamic language.
+Even with type-safe Dart, you can annotate any variable with `dynamic` if you need the flexibility of a dynamic language.
 The `dynamic` type itself is static, but can contain any type at runtime.
-Of course, that removes many of the benefits of a type-safe language
-for that variable.
+Of course, that removes many of the benefits of a type-safe language for that variable.
 
 ### Q. Why are generics covariant?
 
@@ -184,7 +182,7 @@ Inside or outside of Google, [every Flutter app][FlutterShowcase] uses Dart.
 [announcement]: https://blog.chromium.org/2013/11/dart-10-stable-sdk-for-structured-web.html
 [lang]: /guides/language/language-tour
 [libs]: /guides/libraries/library-tour
-[JSON]: {{site.dart_api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/JsonCodec-class.html
+[JSON]: {{site.dart-api}}/{{site.data.pkg-vers.SDK.channel}}/dart-convert/JsonCodec-class.html
 [tc52]: {{site.news}}/2013/12/ecma-forms-tc52-for-dart-standardization.html
 [Dart on the Server]: /server
 [Dart tools]: /tools/
@@ -197,12 +195,27 @@ Inside or outside of Google, [every Flutter app][FlutterShowcase] uses Dart.
 [DDC]: https://github.com/dart-lang/sdk/tree/main/pkg/dev_compiler#dev_compiler
 [strong mode]: /guides/language/type-system
 [Dart's type system]: /guides/language/type-system
-[Flutter no mirrors]: {{site.flutter_docs}}/resources/faq#does-flutter-come-with-a-reflection--mirrors-system
+[Flutter no mirrors]: {{site.flutter-docs}}/resources/faq#does-flutter-come-with-a-reflection--mirrors-system
 [FlutterShowcase]: {{site.flutter}}/showcase
 
 ---
 
 ## Native execution
+
+### Q. Is Dart single-threaded?
+
+No. On native targets, Dart's isolate API can 
+enable multiple threads of execution at any given time.
+The Dart VM uses multiple processor cores
+to run those threads concurrently.
+
+[Dart's concurrency architecture](/guides/language/concurrency)
+abstracts the complex, error-prone code of typical shared-memory threading,
+which might explain the misconception that Dart is single-threaded.
+
+Note that concurrency works differently in Dart web apps.
+To learn more, see
+[Is Dart single-threaded on the web?](#q-is-dart-single-threaded-on-the-web)
 
 ### Q. Can I compile Dart code to native code?
 
@@ -220,7 +233,7 @@ Yes. Dart programs can be compiled to native x64 machine code for running in a
 Terminal/Command Prompt on desktop operating systems such as Windows, macOS, and
 Linux. For more details, see the [dart compile][] documentation.
 
-### Q. Which is faster — AOT- or JIT-compiled code?
+### Q. Which is faster: AOT- or JIT-compiled code?
 
 Code that's compiled ahead-of-time (_AOT_) with
 a tool such as [dart compile][]
@@ -238,15 +251,16 @@ long enough for runtime optimizations to be applied.
 
 ### Q. What browsers do you support as JavaScript compilation targets?
 
-The _production_ compiler ([dart2js][]) supports
-the last two major releases of the following browsers:
+The _production_ web compiler supports the last two major releases of
+the following browsers:
 
   * Chrome
   * Edge
   * Firefox
   * Safari
 
-The _development_ compiler ([dartdevc][]) supports only Chrome.
+The [_development_ JavaScript compiler](/tools/webdev#serve) supports Chrome only.
+You _might_ be able to use other modern browsers: Microsoft Edge, Mozilla Firefox, and Apple Safari).
 
 ### Q. Is Dart supported by my browser?
 
@@ -257,20 +271,27 @@ all modern browsers can execute Dart code that's been compiled to JavaScript.
 
 For setup details and a walkthrough, see [Debugging Dart Web Apps](/web/debugging).
 
-The [debugging](/tools/dart2js#debugging) section of the dart2js documentation
-has some tips for specific browsers.
-
 ### Q. What web frameworks can I use with Dart?
 
-You can use the low-level HTML API defined by core libraries such as dart:html,
-or you can choose from many [web packages](/web/libraries#web-packages).
-You can also use the [Flutter framework]({{site.flutter}}),
-which has [web support]({{site.flutter}}/web)
+You can use the low-level HTML API that core libraries define like `dart:html`, or you can choose from many [web packages](/web/libraries#web-packages).
+You can also use the [Flutter framework]({{site.flutter}}), which has [web support]({{site.flutter}}/web)
 
 ### Q. Will the Dart VM get into Chrome?
 
 [No.]({{site.news}}/2015/03/dart-for-entire-web.html)
 Dart is designed to compile to JavaScript to run across the modern web.
+
+### Q. Is Dart single-threaded on the web?
+
+Dart is *mostly* single-threaded on the web,
+since web apps cannot use isolates.
+To run code concurrently, web apps use [web workers][] instead.
+Web workers lack the ease and efficiency of isolates,
+and have different capabilities and restrictions.
+To learn more, see
+[Concurrency on the web](/guides/language/concurrency#concurrency-on-the-web).
+
+[web workers]: https://developer.mozilla.org/docs/Web/API/Web_Workers_API/Using_web_workers
 
 ---
 
@@ -371,23 +392,28 @@ For example, the `dart:io` library
 provides access to operating system files and directories with APIs not
 available to the browser.
 
-### Q. Why does Dart have two JavaScript compilers, dartdevc and dart2js?
+### Q. Why does Dart have two ways to compile to JavaScript?
 
-The two compilers have different use cases. You don't usually have to worry
-about which compiler you're using, because the [webdev][] tool
-chooses the right compiler for your use case. When you're developing your app,
-webdev chooses [dartdevc][], which supports incremental compilation so
-you can quickly see the results of your edits.
-When you're building your app for deployment, webdev chooses [dart2js][],
-which uses techniques such as tree shaking to produce optimized code.
+Each developer journey has different requirements. How Dart generates
+JavaScript code depends on what you need to do. You should not need to
+worry about which compiler you use. The `[webdev][]` tool chooses the
+right compiler for your use case. 
 
-### Q. How can dart2js produce JavaScript that runs faster than handwritten JavaScript?
+* When you're developing your app, `webdev` uses Dart's development
+  compiler. This compiler creates modular JavaScript code and supports
+  incremental compilation. This allows you to see the results of your
+  edits quickly.
+* When you're deploying your app, `webdev` chooses the production web
+  compiler (which work the same as `dart compile js`). This compiler 
+  uses techniques such as tree shaking to produce optimized code.
 
-Think of dart2js as a real compiler,
-which can analyze your entire program and make optimizations
-that you probably can't or won't do. Just like gcc can output efficient code
-by moving code around, dart2js can take advantage of Dart's structured nature
-to implement global optimizations.
+### Q. How can `dart compile js` produce JavaScript that runs faster than handwritten JavaScript?
+
+The production JavaScript compiler analyzes your entire program and optimizes
+code in ways you might not be able to or want to do. Just like `gcc`
+moves code around to produce efficient code, the production web
+compiler takes advantage of Dart's structured nature to implement
+global optimizations.
 
 We don't claim that all Dart code will run faster
 than handwritten JavaScript, when compiled to JavaScript,
@@ -395,10 +421,9 @@ but we're working to make the common cases fast.
 
 ### Q. How can I write Dart code that compiles to performant JavaScript?
 
-See [Helping dart2js generate better
-code](/tools/dart2js#helping-dart2js-generate-efficient-code).
-Just be aware that this information might change as the implementation of
-dart2js changes.
+See [Improving production web compiliation](/tools/dart-compile#helping-generate-efficient-code).
+This information might change as the implementation of
+`dart compile js` changes.
 
 ### Q. Why is the code for "Hello, World" so big, compared to the original Dart code after compilation to JavaScript?
 
@@ -410,14 +435,14 @@ compression, Dart apps can be compiled to JavaScript fairly efficiently.
 Kevin Moore [saw improvements][ppwsize] in the size of the generated
 JavaScript from his real-world HTML5 game.
 
-The dart2js team strives to generate smaller output, but is more focused on
+The web compiler team strives to reduce output code, but focuses more on
 real-world apps instead of trivial examples.
 
 ### Q. How are floating point numbers handled when compiled to JavaScript?
 
 JavaScript has only one number representation: an IEEE-754 double-precision
-floating-point number. This means that any number&mdash;integer or floating
-point&mdash;is represented as a double. JavaScript has typed data arrays,
+floating-point number. This means that any number—integer or floating
+point—is represented as a double. JavaScript has typed data arrays,
 and the mapping from native Dart typed lists to JavaScript typed arrays is trivial.
 
 ### Q. How are integers handled when compiled to JavaScript?
@@ -433,19 +458,15 @@ staying within smi range is still good practice.
 
 ### Q. How are typed lists handled when compiled to JavaScript?
 
-JavaScript offers typed arrays
-that are compatible with Dart’s typed lists.
-The mapping is trivial—for example,
-Float32List becomes a Float32Array.
-The one exception today is that dart2js does not support 64-bit integers
-and thus does not support Int64List or Uint64List.
-Dart code compiled via dart2js results in a runtime exception
-if either of those lists is used.
+JavaScript offers typed arrays compatible with Dart’s typed lists.
+The mapping is trivial: `Float32List` becomes a `Float32Array`.
+One exception exists: the production JavaScript compiler does not support
+64-bit integers: `Int64List` or `Uint64List`. Compiling Dart code with
+either of those lists results in a runtime exception.
 
 
 [ppwsize]: https://work.j832.com/2012/11/excited-to-see-dart2js-minified-output.html
 [package:js]: {{site.pub-pkg}}/js
-[dart2js]: /tools/dart2js
 [dart compile]: /tools/dart-compile
 [dart analyze]: /tools/dart-analyze
 [dartdevc]: /tools/dartdevc

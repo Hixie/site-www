@@ -6,8 +6,14 @@
 
 {{lint.description}}
 
-{% if lint.maturity != "stable" %}
-_This rule is currently **{{lint.maturity}}**._
+{% if lint.sinceDartSdk == "Unreleased" %}
+_This rule is currently **experimental**
+and not yet available in a stable SDK._
+{% elsif lint.maturity != "stable" %}
+_This rule is currently **{{lint.maturity}}**
+and available as of Dart {{lint.sinceDartSdk}}._
+{% else %}
+_This rule is available as of Dart {{lint.sinceDartSdk}}._
 {% endif %}
 
 {% if lint.sets != empty %}
@@ -34,6 +40,10 @@ _This rule is currently **{{lint.maturity}}**._
 
 <em>Rule sets: {{ rule_sets }}</em>
 
+{% endif %}
+
+{% if lint.fixStatus == "hasFix" %}
+<em>This rule has a [quick fix](#quick-fixes) available.</em>
 {% endif %}
 
 {% if lint.incompatible != empty %}
